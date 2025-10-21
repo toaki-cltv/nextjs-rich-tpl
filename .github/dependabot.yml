@@ -11,13 +11,10 @@ updates:
     schedule:
       interval: "daily"
     groups:
-      angular:
+      tar-updates:
         applies-to: version-updates
         patterns:
           - "tar"
-        update-types:
-          - "minor"
-          - "patch"
 
   # CLI とテンプレートの依存関係を一括チェック
   - package-ecosystem: "npm"
@@ -25,13 +22,10 @@ updates:
     schedule:
       interval: "daily"
     groups:
-      angular:
+      tar-updates:
         applies-to: version-updates
         patterns:
           - "tar"
-        update-types:
-          - "minor"
-          - "patch"
 
   # テンプレートの依存関係を一括でチェック
   - package-ecosystem: "npm"
@@ -42,10 +36,7 @@ updates:
     schedule:
       interval: "daily"
     groups:
-      angular:
+      tar-updates:
         applies-to: version-updates
         patterns:
           - "tar"
-        update-types:
-          - "minor"
-          - "patch"

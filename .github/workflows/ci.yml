@@ -3,34 +3,6 @@ name: CI
 on: [pull_request]
 
 jobs:
-  build-website:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Check for changes
-        id: changes
-        run: |
-          git fetch origin ${{ github.base_ref }} --depth=1
-          if git diff --quiet origin/${{ github.base_ref }} -- website; then
-            echo "skip=true" >> $GITHUB_ENV
-          fi
-      
-      - name: Set up pnpm
-        if: env.skip != 'true'
-        uses: pnpm/action-setup@v4
-
-      - name: Install dependencies
-        if: env.skip != 'true'
-        working-directory: website
-        run: npm install
-
-      - name: Build
-        if: env.skip != 'true'
-        working-directory: website
-        run: npm run build
-
   build-with-i18n-routing:
     runs-on: ubuntu-latest
     steps:
