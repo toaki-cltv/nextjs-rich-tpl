@@ -16,6 +16,10 @@ jobs:
           if git diff --quiet origin/${{ github.base_ref }} -- website; then
             echo "skip=true" >> $GITHUB_ENV
           fi
+      
+      - name: Set up pnpm
+        if: env.skip != 'true'
+        uses: pnpm/action-setup@v4
 
       - name: Install dependencies
         if: env.skip != 'true'
@@ -41,6 +45,10 @@ jobs:
             echo "skip=true" >> $GITHUB_ENV
           fi
 
+      - name: Set up pnpm
+        if: env.skip != 'true'
+        uses: pnpm/action-setup@v4
+
       - name: Install dependencies
         if: env.skip != 'true'
         working-directory: templates/app/with-i18n-routing
@@ -65,6 +73,10 @@ jobs:
             echo "skip=true" >> $GITHUB_ENV
           fi
 
+      - name: Set up pnpm
+        if: env.skip != 'true'
+        uses: pnpm/action-setup@v4
+
       - name: Install dependencies
         if: env.skip != 'true'
         working-directory: templates/app/without-i18n
@@ -88,6 +100,10 @@ jobs:
           if git diff --quiet origin/${{ github.base_ref }} -- templates/app/without-i18n-routing; then
             echo "skip=true" >> $GITHUB_ENV
           fi
+
+      - name: Set up pnpm
+        if: env.skip != 'true'
+        uses: pnpm/action-setup@v4
 
       - name: Install dependencies
         if: env.skip != 'true'

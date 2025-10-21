@@ -15,26 +15,26 @@
   <a aria-label="NPM version" href="https://www.npmjs.com/package/next/">
     <img alt="NPM version" src="https://img.shields.io/npm/v/next?style=for-the-badge&label=NPM&labelColor=black">
   </a>
-  <a aria-label="License" href="https://github.com/toakiryu/nextjs-rich-tpl/blob/main/LICENSE.txt">
-    <img alt="License" src="https://img.shields.io/github/license/toakiryu/nextjs-rich-tpl?style=for-the-badge&labelColor=000000">
+  <a aria-label="License" href="https://github.com/toaki-cltv/nextjs-rich-tpl/blob/main/LICENSE.txt">
+    <img alt="License" src="https://img.shields.io/github/license/toaki-cltv/nextjs-rich-tpl?style=for-the-badge&labelColor=000000">
   </a>
 </p>
 
 <p align="center">
-  <a aria-label="README - English" href="https://github.com/toakiryu/nextjs-rich-tpl/blob/main/README/en.md">
+  <a aria-label="README - English" href="https://github.com/toaki-cltv/nextjs-rich-tpl/blob/main/README/en.md">
     <img alt="README - English" src="https://img.shields.io/badge/English-blue?style=for-the-badge">
   </a>
-  <a aria-label="README - 日本語" href="https://github.com/toakiryu/nextjs-rich-tpl/blob/main/README/ja.md">
+  <a aria-label="README - 日本語" href="https://github.com/toaki-cltv/nextjs-rich-tpl/blob/main/README/ja.md">
     <img alt="README - 日本語" src="https://img.shields.io/badge/日本語-blue?style=for-the-badge">
   </a>
 </p>
 
 <div align="center">
-  <img alt="Release version" src="https://img.shields.io/github/v/release/toakiryu/nextjs-rich-tpl">
-  <img alt="Commit activity" src="https://img.shields.io/github/commit-activity/t/toakiryu/nextjs-rich-tpl">
-  <img alt="Last commit" src="https://img.shields.io/github/last-commit/toakiryu/nextjs-rich-tpl">
-  <img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues/toakiryu/nextjs-rich-tpl">
-  <img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues-pr/toakiryu/nextjs-rich-tpl">
+  <img alt="Release version" src="https://img.shields.io/github/v/release/toaki-cltv/nextjs-rich-tpl">
+  <img alt="Commit activity" src="https://img.shields.io/github/commit-activity/t/toaki-cltv/nextjs-rich-tpl">
+  <img alt="Last commit" src="https://img.shields.io/github/last-commit/toaki-cltv/nextjs-rich-tpl">
+  <img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues/toaki-cltv/nextjs-rich-tpl">
+  <img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues-pr/toaki-cltv/nextjs-rich-tpl">
 </div>
 
 # Next.js Rich Template
@@ -57,7 +57,7 @@ Check out the live preview of this template [here](https://nextjs-rich-tpl.verce
 
 You can deploy the template to Vercel or preview it in StackBlitz:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/toakiryu/nextjs-rich-tpl/tree/main/templates/app/without-i18n&project-name=nextjs-rich-tpl&repository-name=nextjs-rich-tpl)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/toaki-cltv/nextjs-rich-tpl/tree/main/templates/app/without-i18n&project-name=nextjs-rich-tpl&repository-name=nextjs-rich-tpl)
 
 ## Usage
 
@@ -87,6 +87,7 @@ To deploy to the cloud, use [Vercel](https://vercel.com/new?utm_source=github&ut
 - [tabler icons](https://tabler.io/icons)
 
 ## UI
+
 - [shadcn/ui](https://ui.shadcn.com/)
   - 拡張ライブラリ [Magic UI](https://magicui.design/)
 
@@ -96,7 +97,7 @@ To deploy to the cloud, use [Vercel](https://vercel.com/new?utm_source=github&ut
 
 # Contributing
 
-We welcome contributions to improve both the documentation and the project itself. Contributors will be acknowledged in this README. For details, visit the [GitHub repository](https://github.com/toakiryu/nextjs-rich-tpl).
+We welcome contributions to improve both the documentation and the project itself. Contributors will be acknowledged in this README. For details, visit the [GitHub repository](https://github.com/toaki-cltv/nextjs-rich-tpl).
 
 # Acknowledgements
 

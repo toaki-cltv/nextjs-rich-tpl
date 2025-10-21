@@ -24,7 +24,7 @@ type ThemeConfig = {
  * Main configuration type for the site.
  * Includes basic site information, i18n settings, and theme configuration.
  */
-interface Config {
+interface siteConfigType {
   title: string; // Site title
   description?: string; // Site description
   tagline: string; // Site tagline
@@ -39,4 +39,4 @@ interface Config {
   themeConfig: ThemeConfig; // Theme and layout configuration
 }
 
-export default Config;
+export default siteConfigType;

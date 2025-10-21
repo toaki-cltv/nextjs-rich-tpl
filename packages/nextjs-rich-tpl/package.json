@@ -1,8 +1,18 @@
 {
   "name": "nextjs-rich-tpl",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "description": "A command-line tool to scaffold Next.js projects with rich templates and features.",
+  "scripts": {
+    "dist-tag:ls": "pnpm dist-tag ls nextjs-rich-tpl",
+    "release:latest": "pnpm publish --access public --tag latest --no-git-checks",
+    "release:next": "pnpm publish --access public --tag next --no-git-checks",
+    "release:rc": "pnpm publish --access public --tag rc --no-git-checks",
+    "release:beta": "pnpm publish --access public --tag beta --no-git-checks",
+    "release:alpha": "pnpm publish --access public --tag alpha --no-git-checks",
+    "release:canary": "pnpm publish --access public --tag canary --no-git-checks",
+    "release:pre": "pnpm publish --access public --tag pre --no-git-checks"
+  },
   "bin": {
     "nextjs-rich-tpl": "./bin/create.mjs"
   },
@@ -12,11 +22,11 @@
   "author": "toakiryu <toakiryu@gmail.com> (https://toakiryu.com)",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/toakiryu/nextjs-rich-tpl.git",
+    "url": "git+ssh://git@github.com/toaki-cltv/nextjs-rich-tpl.git",
     "directory": "packages/nextjs-rich-tpl"
   },
   "bugs": {
-    "url": "https://github.com/toakiryu/nextjs-rich-tpl/issues",
+    "url": "https://github.com/toaki-cltv/nextjs-rich-tpl/issues",
     "email": "toakiryu@gmail.com"
   },
   "homepage": "https://nextjs-rich-tpl.toakiryu.com",

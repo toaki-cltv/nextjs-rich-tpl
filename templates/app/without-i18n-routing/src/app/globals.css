@@ -1,8 +1,6 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
-@config '../../tailwind.config.ts';
-
-@plugin 'tailwindcss-animate';
+@config "../../tailwind.config.ts";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -122,5 +120,75 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Scrollbar hidden styling */
+.scrollbar-hidden::-webkit-scrollbar {
+  width: 0px;
+}
+
+.scrollbar-hidden::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 0px;
+}
+
+.scrollbar-hidden::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 0px;
+}
+
+.scrollbar-hidden::-webkit-scrollbar-thumb:hover {
+  background: transparent;
+}
+
+/* Scrollbar transparent styling */
+.scrollbar-transparent::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-transparent::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 0px;
+}
+
+.scrollbar-transparent::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 0px;
+}
+
+.scrollbar-transparent::-webkit-scrollbar-thumb:hover {
+  background: transparent;
+}
+
+/* View Transitions API for theme toggle animation */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* 常に新しいテーマが前面に来て、円形に広がる */
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 999;
+}
+
+/* GitHub Octocat wave animation */
+@keyframes octocat-wave {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20%,
+  60% {
+    transform: rotate(-25deg);
+  }
+  40%,
+  80% {
+    transform: rotate(10deg);
   }
 }

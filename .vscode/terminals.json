@@ -1,0 +1,36 @@
+{
+  "autorun": true,
+  "autokill": true,
+  "terminals": [
+    {
+      "name": "Root",
+      "description": "Root directory terminal",
+      "cwd": "./",
+      "open": true
+    },
+    {
+      "name": "Website",
+      "description": "Website project terminal",
+      "cwd": "./website",
+      "open": true
+    },
+    {
+      "name": "Template: with-i18n-routing",
+      "description": "Template with i18n routing",
+      "cwd": "./templates/app/with-i18n-routing",
+      "open": true
+    },
+    {
+      "name": "Template: without-i18n",
+      "description": "Template without i18n",
+      "cwd": "./templates/app/without-i18n",
+      "open": true
+    },
+    {
+      "name": "Template: without-i18n-routing",
+      "description": "Template without i18n routing",
+      "cwd": "./templates/app/without-i18n-routing",
+      "open": true
+    }
+  ]
+}

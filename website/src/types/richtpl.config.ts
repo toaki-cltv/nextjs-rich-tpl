@@ -10,7 +10,7 @@ type i18n = {
   locales: string[]; // Array of supported locales
   localeConfigs: { [locale: string]: localeConfig }; // Configuration for each locale
   selectButton?: boolean; // Option to include a locale selection button
-  localePrefix: "always" | "as-needed"
+  localePrefix: "always" | "as-needed";
 };
 
 /**
