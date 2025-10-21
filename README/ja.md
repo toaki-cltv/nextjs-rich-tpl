@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://nextjs-rich-tpl.vercel.app/">
+  <a href="https://nextjs-rich-tpl.cltv.toaki.cc/">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://assets.vercel.com/image/upload/v1662130559/nextjs/Icon_dark_background.png">
       <img src="https://assets.vercel.com/image/upload/v1662130559/nextjs/Icon_light_background.png" height="128">
@@ -51,7 +51,7 @@
 
 ## プロジェクト概要
 
-このテンプレートのライブプレビューを[こちら](https://nextjs-rich-tpl.vercel.app)で確認できます。
+このテンプレートのライブプレビューを[こちら](https://nextjs-rich-tpl.cltv.toaki.cc)で確認できます。
 
 ## 自分でデプロイ
 

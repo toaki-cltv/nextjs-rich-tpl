@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://nextjs-rich-tpl.vercel.app/">
+  <a href="https://nextjs-rich-tpl.cltv.toaki.cc/">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://assets.vercel.com/image/upload/v1662130559/nextjs/Icon_dark_background.png">
       <img src="https://assets.vercel.com/image/upload/v1662130559/nextjs/Icon_light_background.png" height="128">
@@ -51,7 +51,7 @@ This project provides a robust starting point for building modern web applicatio
 
 ## Project Overview
 
-Check out the live preview of this template [here](https://nextjs-rich-tpl.vercel.app).
+Check out the live preview of this template [here](https://nextjs-rich-tpl.cltv.toaki.cc).
 
 ## Deploy It Yourself
 
