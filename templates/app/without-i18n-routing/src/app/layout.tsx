@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 // config
-import config from "../../richtpl.config";
+import siteConfig from "../../richtpl.config";
 
 // next-intl (i18n)
 import { NextIntlClientProvider } from "next-intl";
@@ -14,6 +14,7 @@ import { headers } from "next/headers";
 import { Toaster } from "sonner";
 
 import { ThemeProvider } from "next-themes";
+import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,13 +30,22 @@ export type LayoutProps = Readonly<{
   children: React.ReactNode;
 }>;
 
+export async function generateViewport() {
+  return {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  };
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: "metadata" });
 
   const header = await headers();
-  const origin = header.get("x-origin") ?? config.url;
-  const url = header.get("x-url") ?? config.url;
+  const origin = header.get("x-origin") ?? siteConfig.url;
+  const url = header.get("x-url") ?? siteConfig.url;
   const pathname = header.get("x-pathname");
   const path = pathname ? pathname : "";
 
@@ -44,41 +54,40 @@ export async function generateMetadata(): Promise<Metadata> {
       canonical: string;
       languages: { [key: string]: string };
     } = {
-      canonical: `${config.url}${path}`,
+      canonical: `${siteConfig.url}${path}`,
       languages: {},
     };
 
-    for (const locale of config.i18n.locales) {
-      const localeConfig = config.i18n.localeConfigs[locale];
+    for (const locale of siteConfig.i18n.locales) {
+      const localeConfig = siteConfig.i18n.localeConfigs[locale];
       const cleanPath = path.replace(`/${locale}`, ""); // Remove current locale from path
-      alternates.languages[
-        localeConfig.htmlLang
-      ] = `${config.url}/${localeConfig.path}${cleanPath}`;
+      alternates.languages[localeConfig.htmlLang] =
+        `${siteConfig.url}/${localeConfig.path}${cleanPath}`;
     }
 
     return alternates;
   };
 
   // titleの値を判別
-  const titleData = config.themeConfig?.metadata?.title;
+  const titleData = siteConfig.themeConfig?.metadata?.title;
   const title = t.has(`title.default`)
     ? t(`title.default`)
     : t.has(`title`)
-    ? t(`title`)
-    : typeof titleData === "string"
-    ? titleData
-    : titleData && "default" in titleData
-    ? titleData.default
-    : titleData && "absolute" in titleData
-    ? titleData.absolute
-    : config.title
-    ? config.title
-    : "Next.js Rich Tpl";
+      ? t(`title`)
+      : typeof titleData === "string"
+        ? titleData
+        : titleData && "default" in titleData
+          ? titleData.default
+          : titleData && "absolute" in titleData
+            ? titleData.absolute
+            : siteConfig.title
+              ? siteConfig.title
+              : "Next.js Rich Tpl";
 
   const description =
     (t.has(`description`) && t(`description`)) ||
-    config.themeConfig.metadata?.description ||
-    config.description;
+    siteConfig.themeConfig.metadata?.description ||
+    siteConfig.description;
 
   return {
     title: {
@@ -90,7 +99,7 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: ["Vercel", "Next.js"],
     authors: [{ name: "Toa Kiryu", url: "https://toakiryu.com" }],
     creator: "Toa Kiryu",
-    icons: config.favicon ?? "/favicon.ico",
+    icons: siteConfig.favicon ?? "/favicon.ico",
     generator: "Next.js",
     publisher: "Vercel",
     robots: "follow, index",
@@ -100,24 +109,26 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: title,
       url: url,
       images:
-        config.themeConfig.metadata?.openGraph?.images ??
-        config.themeConfig.image,
+        siteConfig.themeConfig.metadata?.openGraph?.images ??
+        siteConfig.themeConfig.image,
       locale:
-        config.themeConfig?.metadata?.openGraph?.locale ??
-        config.i18n.localeConfigs[locale].htmlLang ??
+        siteConfig.themeConfig?.metadata?.openGraph?.locale ??
+        siteConfig.i18n.localeConfigs[locale].htmlLang ??
         "ja-JP",
     },
     twitter: {
       card: "summary_large_image",
-      site: `@${config.themeConfig?.metadata?.creator ?? "toakiryu"}`,
-      creator: `@${config.themeConfig?.metadata?.creator ?? "toakiryu"}`,
+      site: `@${siteConfig.themeConfig?.metadata?.creator ?? "toakiryu"}`,
+      creator: `@${siteConfig.themeConfig?.metadata?.creator ?? "toakiryu"}`,
       images:
-        config.themeConfig.metadata?.twitter?.images ??
-        config.themeConfig.image,
+        siteConfig.themeConfig.metadata?.twitter?.images ??
+        siteConfig.themeConfig.image,
     },
-    ...config.themeConfig?.metadata,
+    ...siteConfig.themeConfig?.metadata,
     metadataBase: new URL(
-      origin ?? config.themeConfig?.metadata?.metadataBase ?? config.url
+      origin ??
+        siteConfig.themeConfig?.metadata?.metadataBase ??
+        siteConfig.url,
     ),
   };
 }
@@ -131,18 +142,20 @@ export default async function LocaleLayout({ children }: LayoutProps) {
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`relative w-full h-full overflow-x-clip ${geistSans.variable} ${geistMono.variable} antialiased scroll-smooth`}
+        className={`bg-linear-to-bl from-background to-foreground/5 relative w-full h-full overflow-x-clip ${geistSans.variable} ${geistMono.variable} antialiased scrollbar-hidden`}
         suppressHydrationWarning
       >
         <ThemeProvider
           attribute="class"
           disableTransitionOnChange
-          defaultTheme={config.themeConfig.colorMode.defaultMode}
-          {...config.themeConfig.colorMode.custom}
+          defaultTheme={siteConfig.themeConfig.colorMode.defaultMode}
+          {...siteConfig.themeConfig.colorMode.custom}
         >
           <NextIntlClientProvider messages={messages}>
-            <main className="w-full h-full">{children}</main>
-            <Toaster />
+            <SmoothScrollProvider>
+              <Toaster />
+              {children}
+            </SmoothScrollProvider>
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

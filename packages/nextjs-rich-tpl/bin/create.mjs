@@ -8,21 +8,21 @@ const templates = [
   {
     name: "app/with-i18n-routing",
     description: "Next.js app with i18n routing setup",
-    repo: "toakiryu/nextjs-rich-tpl",
+    repo: "toaki-cltv/nextjs-rich-tpl",
     branch: "main",
     directory: "templates/app/with-i18n-routing",
   },
   {
     name: "app/without-i18n",
     description: "Next.js app without i18n setup",
-    repo: "toakiryu/nextjs-rich-tpl",
+    repo: "toaki-cltv/nextjs-rich-tpl",
     branch: "main",
     directory: "templates/app/without-i18n",
   },
   {
     name: "app/without-i18n-routing",
     description: "Next.js app without i18n routing setup",
-    repo: "toakiryu/nextjs-rich-tpl",
+    repo: "toaki-cltv/nextjs-rich-tpl",
     branch: "main",
     directory: "templates/app/without-i18n-routing",
   },
@@ -48,8 +48,8 @@ const templates = [
 
   console.log(
     chalk.blue(
-      `\nCreating a new Next.js project '${projectName}' using template '${templateName.description}'...\n`
-    )
+      `\nCreating a new Next.js project '${projectName}' using template '${templateName.description}'...\n`,
+    ),
   );
 
   try {
@@ -57,7 +57,7 @@ const templates = [
       `npx create-next-app --example https://github.com/${templateName.repo}/tree/${templateName.branch}/${templateName.directory} ${projectName}`,
       {
         stdio: "inherit",
-      }
+      },
     );
     console.log(chalk.green(`\nSuccess! Created '${projectName}'.`));
   } catch (error) {

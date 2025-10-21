@@ -1,0 +1,23 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-website",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["-F", "@nextjs-rich-tpl/website", "build"],
+      "isBackground": false,
+      "problemMatcher": ["$tsc"],
+      "group": "build"
+    },
+    {
+      "label": "lint-website",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["-F", "@nextjs-rich-tpl/website", "lint"],
+      "isBackground": false,
+      "problemMatcher": ["$eslint-stylish"],
+      "group": "build"
+    }
+  ]
+}

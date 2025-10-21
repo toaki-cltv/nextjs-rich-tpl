@@ -12,46 +12,55 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export async function generateViewport() {
+  return {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  };
+}
+
 // config
-import config from "../../richtpl.config";
+import siteConfig from "../../richtpl.config";
 
 import { headers } from "next/headers";
 
 import { Toaster } from "sonner";
-
 import { ThemeProvider } from "next-themes";
+import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 
 export async function generateMetadata(): Promise<Metadata> {
   const header = await headers();
-  const origin = header.get("x-origin") ?? config.url;
-  const url = header.get("x-url") ?? config.url;
+  const origin = header.get("x-origin") ?? siteConfig.url;
+  const url = header.get("x-url") ?? siteConfig.url;
 
   // titleの値を判別
-  const titleData = config.themeConfig?.metadata?.title;
+  const titleData = siteConfig.themeConfig?.metadata?.title;
   const title =
     typeof titleData === "string"
       ? titleData
       : titleData && "default" in titleData
-      ? titleData.default
-      : titleData && "absolute" in titleData
-      ? titleData.absolute
-      : config.title
-      ? config.title
-      : "Next.js Rich Tpl";
+        ? titleData.default
+        : titleData && "absolute" in titleData
+          ? titleData.absolute
+          : siteConfig.title
+            ? siteConfig.title
+            : "Next.js Rich Tpl";
 
   return {
     title: {
       template: `%s | ${title}`,
       default: title,
     },
-    description: config.description,
+    description: siteConfig.description,
     referrer: "origin-when-cross-origin",
     keywords: ["Vercel", "Next.js"],
-    authors: config.themeConfig?.metadata?.authors ?? [
+    authors: siteConfig.themeConfig?.metadata?.authors ?? [
       { name: "Toa Kiryu", url: "https://toakiryu.com" },
     ],
     creator: "Toa Kiryu",
-    icons: config.favicon ?? "/favicon.ico",
+    icons: siteConfig.favicon ?? "/favicon.ico",
     generator: "Next.js",
     publisher: "Vercel",
     robots: "follow, index",
@@ -59,18 +68,20 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       siteName: title,
       url: url,
-      images: config.themeConfig.image,
+      images: siteConfig.themeConfig.image,
       locale: "ja-JP",
     },
     twitter: {
       card: "summary_large_image",
-      site: `@${config.themeConfig?.metadata?.creator ?? "Toa Kiryu"}`,
-      creator: `@${config.themeConfig?.metadata?.creator ?? "Toa Kiryu"}`,
-      images: config.themeConfig.image,
+      site: `@${siteConfig.themeConfig?.metadata?.creator ?? "Toa Kiryu"}`,
+      creator: `@${siteConfig.themeConfig?.metadata?.creator ?? "Toa Kiryu"}`,
+      images: siteConfig.themeConfig.image,
     },
-    ...config.themeConfig?.metadata,
-        metadataBase: new URL(
-      origin ?? config.themeConfig?.metadata?.metadataBase ?? config.url
+    ...siteConfig.themeConfig?.metadata,
+    metadataBase: new URL(
+      origin ??
+        siteConfig.themeConfig?.metadata?.metadataBase ??
+        siteConfig.url,
     ),
   };
 }
@@ -81,19 +92,21 @@ export default async function LocaleLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ja" suppressHydrationWarning>
+    <html lang="en-US" suppressHydrationWarning>
       <body
-        className={`relative w-full h-full overflow-x-clip ${geistSans.variable} ${geistMono.variable} antialiased scroll-smooth`}
+        className={`bg-linear-to-bl from-background to-foreground/5 relative w-full h-full overflow-x-clip ${geistSans.variable} ${geistMono.variable} antialiased scrollbar-hidden`}
         suppressHydrationWarning
       >
         <ThemeProvider
           attribute="class"
           disableTransitionOnChange
-          defaultTheme={config.themeConfig.colorMode.defaultMode}
-          {...config.themeConfig.colorMode.custom}
+          defaultTheme={siteConfig.themeConfig.colorMode.defaultMode}
+          {...siteConfig.themeConfig.colorMode.custom}
         >
-          <main className="w-full h-full">{children}</main>
-          <Toaster />
+          <SmoothScrollProvider>
+            <Toaster />
+            {children}
+          </SmoothScrollProvider>
         </ThemeProvider>
       </body>
     </html>

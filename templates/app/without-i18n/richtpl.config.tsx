@@ -1,10 +1,10 @@
-import Config from "@/types/richtpl.config";
+import siteConfigType from "@/types/richtpl.config";
 
 /**
  * Site configuration object.
  * Contains general site information, i18n settings, and theme configuration.
  */
-const config: Config = {
+const siteConfig: siteConfigType = {
   // Tagline for the site
   tagline: "Next.js Template",
 
@@ -18,7 +18,8 @@ const config: Config = {
   baseUrl: "/",
 
   title: "nextjs-rich-tpl",
-  description: "このプロジェクトは、最新のWebアプリケーションを構築するための堅牢なスタートポイントを提供することを目的としたNext.jsテンプレートです。事前に構成されたローカリゼーションサポート、テーマ切り替え、その他のさまざまな機能が含まれており、開発を効率化します。",
+  description:
+    "このプロジェクトは、最新のWebアプリケーションを構築するための堅牢なスタートポイントを提供することを目的としたNext.jsテンプレートです。事前に構成されたローカリゼーションサポート、テーマ切り替え、その他のさまざまな機能が含まれており、開発を効率化します。",
 
   // GitHub deployment configuration
   organizationName: "toakiryu", // GitHub organization/user name
@@ -71,4 +72,4 @@ const config: Config = {
   },
 };
 
-export default config;
+export default siteConfig;

@@ -29,9 +29,9 @@ After installation, you will see the following prompts:
 
 ```bash
 Select a Next.js template:
-❯ Next.js app with i18n routing setup 
-  Next.js app without i18n routing setup 
-Enter your project name: (my-nextjs-app) 
+❯ Next.js app with i18n routing setup
+  Next.js app without i18n routing setup
+Enter your project name: (my-nextjs-app)
 ```
 
 After the prompts, `nextjs-rich-tpl` will create a folder with your project name and install the necessary dependencies.

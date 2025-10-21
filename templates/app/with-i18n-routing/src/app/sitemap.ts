@@ -29,12 +29,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         languages: config.i18n.locales.reduce<{ [key: string]: string }>(
           (acc, l) => {
             const lConfig = config.i18n.localeConfigs[l];
-            acc[lConfig.htmlLang] = l === config.i18n.defaultLocale 
-              ? config.url 
-              : `${config.url}/${lConfig.path}`;
+            acc[lConfig.htmlLang] =
+              l === config.i18n.defaultLocale
+                ? config.url
+                : `${config.url}/${lConfig.path}`;
             return acc;
           },
-          {}
+          {},
         ),
       },
     });
@@ -68,9 +69,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                   [key: string]: string;
                 }>((acc, l) => {
                   const lConfig = config.i18n.localeConfigs[l];
-                  acc[lConfig.htmlLang] = l === config.i18n.defaultLocale 
-                    ? `${config.url}/${item.name}`
-                    : `${config.url}/${lConfig.path}/${item.name}`;
+                  acc[lConfig.htmlLang] =
+                    l === config.i18n.defaultLocale
+                      ? `${config.url}/${item.name}`
+                      : `${config.url}/${lConfig.path}/${item.name}`;
                   return acc;
                 }, {}),
               },

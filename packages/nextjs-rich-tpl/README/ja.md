@@ -29,9 +29,9 @@ npx nextjs-rich-tpl
 
 ```bash
 Select a Next.js template:
-❯ Next.js app with i18n routing setup 
-  Next.js app without i18n routing setup 
-Enter your project name: (my-nextjs-app) 
+❯ Next.js app with i18n routing setup
+  Next.js app without i18n routing setup
+Enter your project name: (my-nextjs-app)
 ```
 
 プロンプトの後、`nextjs-rich-tpl` はプロジェクト名のフォルダを作成し、必要な依存関係をインストールします。

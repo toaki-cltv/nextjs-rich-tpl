@@ -3,8 +3,14 @@
   "private": true,
   "version": "0.0.1",
   "scripts": {
-    "cd": "node ./scripts/cd.mjs",
-    "cleanup": "node ./scripts/cleanMacJunkFiles.mjs"
+    "cleanup": "node ./scripts/cleanMacJunkFiles.mjs",
+    "clean": "node ./clean.mjs"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "pnpm": ">=10.1.0",
+    "npm": "use pnpm please!",
+    "yarn": "use pnpm please!"
+  },
+  "packageManager": "pnpm@10.15.0"
 }
