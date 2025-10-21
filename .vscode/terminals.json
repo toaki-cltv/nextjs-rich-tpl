@@ -9,9 +9,9 @@
       "open": true
     },
     {
-      "name": "Website",
-      "description": "Website project terminal",
-      "cwd": "./website",
+      "name": "CLI Tool",
+      "description": "CLI tool terminal",
+      "cwd": "./packages/nextjs-rich-tpl",
       "open": true
     },
     {
