@@ -35,9 +35,6 @@ export function ColorModeToggle() {
       Math.max(y, window.innerHeight - y),
     );
 
-    // 現在のテーマを実際のDOMから判定（より確実）
-    const isDarkMode = document.documentElement.classList.contains("dark");
-
     // View Transition を開始
     const transition = document.startViewTransition(() => {
       setTheme(newTheme);
