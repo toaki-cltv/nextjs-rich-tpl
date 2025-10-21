@@ -1,13 +1,12 @@
 "use client";
 
 import clsx from "clsx";
-import { useParams } from "next/navigation";
 import { ReactNode, useTransition } from "react";
+import { useParams } from "next/navigation";
 import { Locale, usePathname, useRouter } from "@/i18n/routing";
 import {
   Select,
   SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/shadcn/select";
