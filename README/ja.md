@@ -34,6 +34,8 @@
   </a>
 </div>
 
+<br/>
+
 <div align="center">
   <a aria-label="README - English" href="https://github.com/toaki-cltv/nextjs-rich-tpl/blob/main/README/en.md">
     <img alt="README - English" src="https://img.shields.io/badge/English-blue?style=for-the-badge">
