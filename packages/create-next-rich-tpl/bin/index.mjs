@@ -1,24 +1,54 @@
 import fs from "fs/promises";
 import path from "path";
 import { spawnSync } from "child_process";
+import fsSync from 'fs';
+import cliProgress from 'cli-progress';
+import chalk from 'chalk';
 
 export async function copyRecursive(src, dest, options = {}) {
-  const { skip = ["node_modules", ".git"] } = options;
-  const stat = await fs.stat(src);
-  if (stat.isDirectory()) {
-    await fs.mkdir(dest, { recursive: true });
-    const entries = await fs.readdir(src, { withFileTypes: true });
-    for (const entry of entries) {
-      if (skip.includes(entry.name)) continue;
-      const srcPath = path.join(src, entry.name);
-      const destPath = path.join(dest, entry.name);
-      if (entry.isDirectory()) await copyRecursive(srcPath, destPath, options);
-      else if (entry.isSymbolicLink()) continue;
-      else await fs.copyFile(srcPath, destPath);
+  const { skip = ["node_modules", ".git"], showProgress = true } = options;
+  async function gatherFiles(d) {
+    const files = [];
+    async function walk(cur) {
+      const entries = await fs.readdir(cur, { withFileTypes: true });
+      for (const e of entries) {
+        if (skip.includes(e.name)) continue;
+        const p = path.join(cur, e.name);
+        if (e.isDirectory()) await walk(p);
+        else if (e.isSymbolicLink()) continue;
+        else files.push(p);
+      }
     }
-  } else {
-    await fs.copyFile(src, dest);
+    await walk(d);
+    return files;
   }
+
+  const stat = await fs.stat(src);
+  if (!stat.isDirectory()) {
+    await fs.mkdir(path.dirname(dest), { recursive: true });
+    await fs.copyFile(src, dest);
+    return;
+  }
+
+  const allFiles = await gatherFiles(src);
+  const bar = showProgress && allFiles.length > 0 ? new cliProgress.SingleBar({
+    format: 'Copying [{bar}] {percentage}% | {value}/{total} files',
+  }, cliProgress.Presets.shades_classic) : null;
+
+  if (bar) bar.start(allFiles.length, 0);
+
+  await fs.mkdir(dest, { recursive: true });
+  let copied = 0;
+  for (const f of allFiles) {
+    const rel = path.relative(src, f);
+    const out = path.join(dest, rel);
+    await fs.mkdir(path.dirname(out), { recursive: true });
+    await fs.copyFile(f, out);
+    copied++;
+    if (bar) bar.update(copied);
+  }
+
+  if (bar) bar.stop();
 }
 
 export async function ensureInquirerAndChalk() {

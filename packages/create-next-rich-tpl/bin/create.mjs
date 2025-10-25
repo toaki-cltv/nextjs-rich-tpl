@@ -3,7 +3,7 @@
 import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs/promises";
-import { spawnSync } from "child_process";
+import { spawn, spawnSync } from "child_process";
 import os from "os";
 
 import { ensureInquirerAndChalk, copyRecursive as sharedCopy, runPostCreateScript } from "./index.mjs";
@@ -191,6 +191,13 @@ async function loadTemplatesIndex(root) {
 }
 
 async function fetchRemoteIndex(remoteUrl, root, opts = {}) {
+  let spinner;
+  try {
+    const ora = (await import('ora')).default;
+    spinner = ora(`Fetching remote templates index: ${remoteUrl}`).start();
+  } catch (e) {
+    console.log('[create] Fetching remote templates index:', remoteUrl);
+  }
   const timeout = opts.timeout || 3000;
   const cacheDir = path.join(os.homedir(), '.cache', 'create-next-rich-tpl');
   const cacheFile = path.join(cacheDir, 'index.json');
@@ -209,6 +216,8 @@ async function fetchRemoteIndex(remoteUrl, root, opts = {}) {
       process.exit(2);
     }
     if (doc && Array.isArray(doc.templates)) {
+      if (spinner) spinner.succeed(`Remote index fetched. Templates: ${doc.templates.length}`);
+      else console.log('[create] Remote index fetched. Templates:', doc.templates.length);
       await fs.mkdir(cacheDir, { recursive: true });
       await fs.writeFile(cacheFile, JSON.stringify(doc, null, 2), 'utf8');
       // map similar to loadTemplatesIndex
@@ -234,7 +243,8 @@ async function fetchRemoteIndex(remoteUrl, root, opts = {}) {
       return mapped;
     }
   } catch (err) {
-    console.error('fetchRemoteIndex: failed to fetch remote index:', String(err));
+  if (spinner) spinner.fail('Failed to fetch remote templates index');
+  console.error('[create] fetchRemoteIndex: failed to fetch remote index:', String(err));
     // try cache
     try {
       const raw = await fs.readFile(cacheFile, 'utf8');
@@ -246,6 +256,7 @@ async function fetchRemoteIndex(remoteUrl, root, opts = {}) {
         process.exit(2);
       }
       if (doc && Array.isArray(doc.templates)) {
+        console.log('[create] Loaded templates from cache. Templates:', doc.templates.length);
         const mapped = doc.templates.map((t) => {
           const src = t.source || {};
           if (!t || typeof t !== 'object' || !t.title || !src || !src.type) {
@@ -279,6 +290,13 @@ async function cloneGitTemplateToTemp(source) {
   const tmp = path.join(os.tmpdir(), `create-next-rich-tpl-${Date.now()}`);
   await fs.mkdir(tmp, { recursive: true });
   try {
+    let spinner;
+    try {
+      const ora = (await import('ora')).default;
+      spinner = ora(`Cloning git template: ${source.repo} ${source.path || ''}`).start();
+    } catch (e) {
+      console.log('[create] Cloning git template:', source.repo, source.path || '');
+    }
     const degit = (await import('degit')).default;
     // degit supports targets like 'owner/repo', 'owner/repo/path', and '#ref' suffix
     // build target robustly: prefer repo + (path) + (#ref)
@@ -294,30 +312,34 @@ async function cloneGitTemplateToTemp(source) {
     // clone with a timeout wrapper
     const emitter = degit(target, { cache: false });
     const clonePromise = emitter.clone(tmp);
-  const timeoutMs = source.timeout || 60000;
-    const p = Promise.race([
+    const timeoutMs = source.timeout || 60000;
+    await Promise.race([
       clonePromise,
       new Promise((_, reject) => setTimeout(() => reject(new Error('degit clone timeout')), timeoutMs)),
     ]);
-    await p;
+
     // register for cleanup
     registerTmp(tmp);
+    if (spinner) spinner.succeed('Clone completed');
     // If a hash is provided on the source, compute and verify
-    try {
-      if (source.hash) {
+    if (source.hash) {
+      try {
         const actual = await computeDirSha256(tmp, { skip: ['node_modules', '.git'] });
         if (actual !== source.hash) {
           throw new Error(`template hash mismatch: expected ${source.hash} got ${actual}`);
         }
+      } catch (err) {
+        try { await fs.rm(tmp, { recursive: true, force: true }); } catch (e) {}
+        _tmpDirs.delete(tmp);
+        throw err;
       }
-    } catch (err) {
-      // cleanup and rethrow
-      try { await fs.rm(tmp, { recursive: true, force: true }); } catch (e) {}
-      _tmpDirs.delete(tmp);
-      throw err;
     }
     return tmp;
   } catch (err) {
+    if (spinner) spinner.fail('Clone failed');
+    try { await fs.rm(tmp, { recursive: true, force: true }); } catch (e) {}
+    _tmpDirs.delete(tmp);
+    console.error('[create] cloneGitTemplateToTemp error:', String(err));
     throw err;
   }
 }
@@ -385,6 +407,8 @@ for (let i = 0; i < argv.length; i++) {
   else if (a === '--name' && argv[i+1]) { flags.name = argv[++i]; }
   else if (a === '--timeout' && argv[i+1]) { flags.timeout = parseInt(argv[++i], 10); }
   else if (a === '--accept-postcreate' || a === '-a') flags.acceptPostCreate = true;
+    else if (a === '--wait-cleanup') flags.waitCleanup = true;
+    else if (a === '--no-background-cleanup') flags.waitCleanup = true;
 }
 
 // function debugLog(...args) {
@@ -465,14 +489,19 @@ async function main() {
   let mappedEntries = null;
   if (isLocalRun) {
     // When running inside the repo, prefer the repo index (which may contain both local and git entries).
+    console.log('[create] Loading local templates index from repo...');
     mappedEntries = await loadTemplatesIndex(repoRoot);
     if (!Array.isArray(mappedEntries) || mappedEntries.length === 0) {
       // Fallback to scanning templates/app
+      console.log('[create] No index entries found, scanning templates/app...');
       mappedEntries = await findLocalTemplates(repoRoot);
     }
   } else {
     // Not a local run (e.g., dlx/npx). Try remote index first (if configured), otherwise attempt to read any index available.
-    if (remoteIndexUrl) mappedEntries = await fetchRemoteIndex(remoteIndexUrl, repoRoot, { timeout: flags.timeout || 3000 });
+    if (remoteIndexUrl) {
+      console.log('[create] Non-local run: attempting to fetch remote index...');
+      mappedEntries = await fetchRemoteIndex(remoteIndexUrl, repoRoot, { timeout: flags.timeout || 3000 });
+    }
     if (!mappedEntries) mappedEntries = await loadTemplatesIndex(repoRoot);
     // When not local, hide any 'local' entries because their paths won't exist in the runtime environment.
     if (Array.isArray(mappedEntries)) mappedEntries = mappedEntries.filter((e) => e.type === 'git');
@@ -503,7 +532,7 @@ async function main() {
   if (flags.template && flags.name) {
     projectName = flags.name;
     // find matching template by id or name
-    choice = items.find((it) => it.id === flags.template || it.name === flags.template || it.title === flags.template);
+    choice = items.find((it) => it.id === flags.template || it.name === flags.template || it.title === flags.template || `${it.title} [${it.type}]` === flags.template);
     if (!choice) {
       console.error('Template specified by --template not found:', flags.template);
       process.exit(2);
@@ -524,6 +553,7 @@ async function main() {
   if (choice.type === "local") {
     const dest = path.resolve(process.cwd(), projectName);
     try {
+  console.log('[create] Copying template files...');
   await sharedCopy(choice.path, dest);
       console.log(chalk.green(`Project created at: ${dest}`));
     } catch (err) {
@@ -544,7 +574,11 @@ async function main() {
       if (runIt) {
         console.log(chalk.blue(`Running post-create script: ${choice.postCreate}`));
         try {
-          await runPostCreateScript(dest, choice.postCreate, []);
+            console.log('[create] Starting post-create script:', choice.postCreate, 'at', new Date().toISOString());
+            const t0 = Date.now();
+            await runPostCreateScript(dest, choice.postCreate, []);
+            const t1 = Date.now();
+            console.log('[create] Finished post-create script:', choice.postCreate, 'duration_ms=', t1 - t0);
         } catch (err) {
           console.error(chalk.red('post-create script failed:'), err);
         }
@@ -568,6 +602,7 @@ async function main() {
         if (flags.timeout && choice.source && !choice.source.timeout) choice.source.timeout = flags.timeout;
         tmp = await cloneGitTemplateToTemp(choice.source);
       // tmp now contains repo contents (possibly whole repo) - if source.path was provided degit should have checked it out
+      console.log('[create] Copying files from cloned template to destination...');
       await sharedCopy(tmp, dest);
       console.log(chalk.green(`Project created at: ${dest}`));
       // post-create hook for git-sourced templates
@@ -596,12 +631,108 @@ async function main() {
       process.exit(1);
     } finally {
       // remove only the tmp we used
-      if (tmp) {
-        try {
-          await fs.rm(tmp, { recursive: true, force: true });
-          _tmpDirs.delete(tmp);
-        } catch (e) {}
-      }
+          if (tmp) {
+            try {
+              // If user asked to wait for cleanup, run it in-process and show a spinner if available.
+              if (flags.waitCleanup) {
+                console.log('[create] Waiting for cleanup to finish...');
+                const ora = await (async () => {
+                  try { const o = (await import('ora')).default; return o; } catch (e) { return null; }
+                })();
+                const spinner = ora ? ora({ text: 'Cleaning up temporary files...' }).start() : null;
+                const t0 = Date.now();
+                await fs.rm(tmp, { recursive: true, force: true });
+                const t1 = Date.now();
+                if (spinner) spinner.succeed('Cleanup finished');
+                console.log('[create] Removed temporary directory:', tmp, 'duration_ms=', t1 - t0);
+                _tmpDirs.delete(tmp);
+              } else {
+                // spawn a detached Node process to perform cleanup in background using bin/cleanup.js
+                const cleanupScript = path.join(__dirname, 'cleanup.js');
+                const nodeExe = process.execPath;
+                try {
+                  // Spawn cleanup and show progress by default so user sees activity.
+                  // If the user explicitly wanted background cleanup, they can pass --bg-cleanup (not yet implemented).
+                  const oraMod = await (async () => { try { return (await import('ora')).default; } catch (e) { return null; } })();
+                  const barMod = await (async () => { try { return (await import('cli-progress')).SingleBar; } catch (e) { return null; } })();
+                  const child = spawn(nodeExe, [cleanupScript, tmp], { detached: false, stdio: ['ignore', 'pipe', 'pipe'] });
+                  console.log('[create] Cleanup started (showing progress). pid=', child.pid);
+                  _tmpDirs.delete(tmp);
+
+                  const spinner = oraMod ? oraMod({ text: 'Cleaning up temporary files...' }).start() : null;
+                  let progressBar = null;
+                  let total = 0;
+                  let removed = 0;
+
+                  const rl = child.stdout;
+                  let buffer = '';
+                  rl.setEncoding('utf8');
+                  rl.on('data', (chunk) => {
+                    buffer += chunk;
+                    let idx;
+                    while ((idx = buffer.indexOf('\n')) >= 0) {
+                      const line = buffer.slice(0, idx).trim();
+                      buffer = buffer.slice(idx + 1);
+                      if (!line) continue;
+                      try {
+                        const obj = JSON.parse(line);
+                        if (obj.type === 'progress') {
+                          total = obj.total || total;
+                          removed = obj.removed || removed;
+                          if (!progressBar && barMod && total > 0) {
+                            progressBar = new barMod({ format: 'Cleaning [{bar}] {percentage}% | {value}/{total} files', hideCursor: true });
+                            progressBar.start(total, removed);
+                            if (spinner) spinner.stop();
+                          }
+                          if (progressBar) progressBar.update(removed);
+                          else if (spinner) spinner.text = `Cleaning up... ${removed}`;
+                        } else if (obj.type === 'done') {
+                          if (progressBar) progressBar.update(total);
+                          if (spinner) spinner.succeed('Cleanup finished');
+                          // no-op
+                        }
+                      } catch (e) {
+                        // ignore non-json lines
+                      }
+                    }
+                  });
+
+                  child.stderr.on('data', (d) => {
+                    if (spinner) spinner.stop();
+                    console.error('[create][cleanup][stderr]', d.toString());
+                  });
+
+                  child.on('close', (code) => {
+                    if (progressBar) {
+                      try { progressBar.stop(); } catch (e) {}
+                    }
+                    if (spinner && spinner.isSpinning) {
+                      if (code === 0) spinner.succeed('Cleanup finished');
+                      else spinner.fail('Cleanup failed');
+                    }
+                    console.log('[create] Cleanup process exited with code', code);
+                    // Ensure we don't leave the parent process lingering due to open handles elsewhere.
+                    // Schedule a short-tick forced exit so the CLI returns promptly after cleanup.
+                    try {
+                      setTimeout(() => {
+                        try { process.exit(code || 0); } catch (e) { /* best-effort */ }
+                      }, 50);
+                    } catch (e) {}
+                  });
+                } catch (e) {
+                  // fallback to synchronous removal
+                  console.error('[create] Failed to spawn background cleanup, falling back to sync cleanup:', String(e));
+                  const t0 = Date.now();
+                  await fs.rm(tmp, { recursive: true, force: true });
+                  const t1 = Date.now();
+                  console.log('[create] Removed temporary directory (fallback):', tmp, 'duration_ms=', t1 - t0);
+                  _tmpDirs.delete(tmp);
+                }
+              }
+            } catch (e) {
+              console.error('[create] Cleanup error:', String(e));
+            }
+          }
     }
   }
 }
