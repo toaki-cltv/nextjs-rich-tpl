@@ -74,8 +74,8 @@ Notes:
 
 Security and post-create scripts:
 
-- A template may include a `postCreate` field (relative path to a JS script inside the template). The CLI will ask for confirmation before running it by default. For automation, you can pass `--yes` to auto-run, but be careful when running templates from untrusted sources.
-- In future, the CLI may add hash/signature verification for remote templates before running `postCreate`.
+- A template may include a `postCreate` field (relative path to a JS script inside the template). The CLI will ask for confirmation before running it by default. For automation, the CLI provides a dedicated flag `--accept-postcreate` (or `-a`) to explicitly opt in to automatically run the post-create script. The general `--yes` flag still auto-confirms other prompts but will not automatically run `postCreate` for safety.
+- The CLI now supports optional `hash` fields on `git` sources (SHA256 hex). If provided, the CLI will verify the cloned template content matches the expected hash and fail if it does not. This helps mitigate tampering for remote templates.
 
 Publishing index.json
 

@@ -23,7 +23,7 @@ jobs:
 
       - name: Run create with ci-postcreate template (auto-run postCreate)
         run: |
-          node ./packages/create-next-rich-tpl/bin/create.mjs --template app/ci-postcreate --name postcreate-app --yes --verbose
+          node ./packages/create-next-rich-tpl/bin/create.mjs --template app/ci-postcreate --name postcreate-app --accept-postcreate --verbose
 
       - name: Verify marker file was written by post-create
         run: |

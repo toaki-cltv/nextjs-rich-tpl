@@ -7,6 +7,9 @@ import { spawnSync } from "child_process";
 import os from "os";
 
 import { ensureInquirerAndChalk, copyRecursive as sharedCopy, runPostCreateScript } from "./index.mjs";
+import crypto from 'crypto';
+import Ajv from 'ajv';
+import fsSync from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -104,16 +107,53 @@ async function findLocalTemplates(root) {
   }
 }
 
+// Validate index.json shape with minimal but strict checks.
+// Use Ajv against templates/index.schema.json for validation
+let _ajvValidate = null;
+function initAjvValidator() {
+  if (_ajvValidate) return _ajvValidate;
+  try {
+    const schemaPath = path.join(repoRootFromBinDir(), 'templates', 'index.schema.json');
+    const raw = fsSync.readFileSync(schemaPath, 'utf8');
+    const schema = JSON.parse(raw);
+    const ajv = new Ajv({ allErrors: true });
+    _ajvValidate = ajv.compile(schema);
+    return _ajvValidate;
+  } catch (err) {
+    console.warn('Failed to initialize Ajv validator for templates/index.schema.json:', String(err));
+    // fallback to permissive validator
+    _ajvValidate = (d) => true;
+    _ajvValidate.errors = null;
+    return _ajvValidate;
+  }
+}
+
+function validateIndex(doc) {
+  const validate = initAjvValidator();
+  const ok = validate(doc);
+  if (ok) return [];
+  return (validate.errors || []).map((e) => `${e.instancePath || ''} ${e.message}`);
+}
+
 async function loadTemplatesIndex(root) {
   // Prefer central index at templates/index.json
   const idxPath = path.join(root, "templates", "index.json");
   try {
     const raw = await fs.readFile(idxPath, "utf8");
     const doc = JSON.parse(raw);
-    if (!doc || !Array.isArray(doc.templates)) return null;
-    // map entries to our internal shape (only local types handled here)
+    const vErr = validateIndex(doc);
+    if (vErr.length > 0) {
+      console.error('templates/index.json failed validation:');
+      for (const e of vErr) console.error('  -', e);
+      process.exit(2);
+    }
+    // map entries to our internal shape
     const mapped = doc.templates.map((t) => {
       const src = t.source || {};
+      if (!t || typeof t !== 'object' || !t.title || !src || !src.type) {
+        console.warn('loadTemplatesIndex: skipping invalid template entry', t && t.id);
+        return null;
+      }
       if (src.type === "local") {
         // resolve relative path to absolute
         const abs = path.resolve(root, src.path);
@@ -129,7 +169,14 @@ async function loadTemplatesIndex(root) {
           path: abs,
         };
       }
-      // other source types (git/npm) could be represented as package-style entries
+      if (src.type === 'git') {
+        if (!src.repo) {
+          console.warn('loadTemplatesIndex: git entry missing repo field, skipping', t.id || src.repo);
+          return null;
+        }
+        return { type: 'git', id: t.id || src.repo, name: t.id || src.repo, title: t.title || src.repo, description: t.description, tags: t.tags || [], source: src, postCreate: t.postCreate };
+      }
+      // other source types (package) could be represented differently
       return null;
     }).filter(Boolean);
     return mapped;
@@ -149,18 +196,32 @@ async function fetchRemoteIndex(remoteUrl, root, opts = {}) {
     clearTimeout(id);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const doc = await res.json();
-    // validate minimal schema
+    // validate strict schema
+    const vErr = validateIndex(doc);
+    if (vErr.length > 0) {
+      console.error('Remote templates index failed validation:');
+      for (const e of vErr) console.error('  -', e);
+      process.exit(2);
+    }
     if (doc && Array.isArray(doc.templates)) {
       await fs.mkdir(cacheDir, { recursive: true });
       await fs.writeFile(cacheFile, JSON.stringify(doc, null, 2), 'utf8');
       // map similar to loadTemplatesIndex
       const mapped = doc.templates.map((t) => {
         const src = t.source || {};
+        if (!t || typeof t !== 'object' || !t.title || !src || !src.type) {
+          console.warn('fetchRemoteIndex: skipping invalid template entry', t && t.id);
+          return null;
+        }
         if (src.type === 'local') {
           const abs = path.resolve(root, src.path);
           return { type: 'local', id: t.id || abs, name: path.basename(src.path), title: t.title || path.basename(src.path), description: t.description, tags: t.tags || [], postCreate: t.postCreate, path: abs };
         }
         if (src.type === 'git') {
+          if (!src.repo) {
+            console.warn('fetchRemoteIndex: git entry missing repo field, skipping', t.id || src.repo);
+            return null;
+          }
           return { type: 'git', id: t.id || src.repo, name: t.id || src.repo, title: t.title || src.repo, description: t.description, tags: t.tags || [], source: src, postCreate: t.postCreate };
         }
         return null;
@@ -173,15 +234,29 @@ async function fetchRemoteIndex(remoteUrl, root, opts = {}) {
     try {
       const raw = await fs.readFile(cacheFile, 'utf8');
       const doc = JSON.parse(raw);
+      const vErr = validateIndex(doc);
+      if (vErr.length > 0) {
+        console.error('Cached templates index failed validation:');
+        for (const e of vErr) console.error('  -', e);
+        process.exit(2);
+      }
       if (doc && Array.isArray(doc.templates)) {
         const mapped = doc.templates.map((t) => {
           const src = t.source || {};
+          if (!t || typeof t !== 'object' || !t.title || !src || !src.type) {
+            console.warn('fetchRemoteIndex(cache): skipping invalid template entry', t && t.id);
+            return null;
+          }
           if (src.type === 'local') {
             const abs = path.resolve(root, src.path);
-            return { type: 'local', id: t.id || abs, name: path.basename(src.path), title: t.title || path.basename(src.path), description: t.description, tags: t.tags || [], path: abs };
+            return { type: 'local', id: t.id || abs, name: path.basename(src.path), title: t.title || path.basename(src.path), description: t.description, tags: t.tags || [], postCreate: t.postCreate, path: abs };
           }
           if (src.type === 'git') {
-            return { type: 'git', id: t.id || src.repo, name: t.id || src.repo, title: t.title || src.repo, description: t.description, tags: t.tags || [], source: src };
+            if (!src.repo) {
+              console.warn('fetchRemoteIndex(cache): git entry missing repo field, skipping', t.id || src.repo);
+              return null;
+            }
+            return { type: 'git', id: t.id || src.repo, name: t.id || src.repo, title: t.title || src.repo, description: t.description, tags: t.tags || [], source: src, postCreate: t.postCreate };
           }
           return null;
         }).filter(Boolean);
@@ -222,6 +297,20 @@ async function cloneGitTemplateToTemp(source) {
     await p;
     // register for cleanup
     registerTmp(tmp);
+    // If a hash is provided on the source, compute and verify
+    try {
+      if (source.hash) {
+        const actual = await computeDirSha256(tmp, { skip: ['node_modules', '.git'] });
+        if (actual !== source.hash) {
+          throw new Error(`template hash mismatch: expected ${source.hash} got ${actual}`);
+        }
+      }
+    } catch (err) {
+      // cleanup and rethrow
+      try { await fs.rm(tmp, { recursive: true, force: true }); } catch (e) {}
+      _tmpDirs.delete(tmp);
+      throw err;
+    }
     return tmp;
   } catch (err) {
     throw err;
@@ -290,10 +379,38 @@ for (let i = 0; i < argv.length; i++) {
   else if (a === '--template' && argv[i+1]) { flags.template = argv[++i]; }
   else if (a === '--name' && argv[i+1]) { flags.name = argv[++i]; }
   else if (a === '--timeout' && argv[i+1]) { flags.timeout = parseInt(argv[++i], 10); }
+  else if (a === '--accept-postcreate' || a === '-a') flags.acceptPostCreate = true;
 }
 
-function debugLog(...args) {
-  if (flags.verbose || process.env.DEBUG) console.debug('[debug]', ...args);
+// function debugLog(...args) {
+//   if (flags.verbose || process.env.DEBUG) console.debug('[debug]', ...args);
+// }
+
+// compute a deterministic sha256 of directory contents (sorted paths)
+async function computeDirSha256(dir, options = {}) {
+  const skip = options.skip || ['node_modules', '.git'];
+  const files = [];
+  async function walk(d) {
+    const entries = await fs.readdir(d, { withFileTypes: true });
+    for (const e of entries) {
+      if (skip.includes(e.name)) continue;
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) await walk(p);
+      else if (e.isSymbolicLink()) continue;
+      else files.push(p);
+    }
+  }
+  await walk(dir);
+  files.sort();
+  const hash = crypto.createHash('sha256');
+  for (const f of files) {
+    const rel = path.relative(dir, f).replace(/\\/g, '/');
+    hash.update(rel + '\0');
+    const buf = await fs.readFile(f);
+    hash.update(buf);
+    hash.update('\0');
+  }
+  return hash.digest('hex');
 }
 
 async function main() {
@@ -313,7 +430,7 @@ async function main() {
   // try remote fetch if configured, then local index, then filesystem
   let indexed = null;
   if (remoteIndexUrl) {
-    indexed = await fetchRemoteIndex(remoteIndexUrl, repoRoot, { timeout: 3000 });
+    indexed = await fetchRemoteIndex(remoteIndexUrl, repoRoot, { timeout: flags.timeout || 3000 });
   }
   if (!indexed) indexed = await loadTemplatesIndex(repoRoot);
   const local = Array.isArray(indexed) && indexed.length > 0 ? indexed : await findLocalTemplates(repoRoot);
@@ -365,7 +482,8 @@ async function main() {
     // post-create hook (opt-in)
     if (choice.postCreate) {
       let runIt = false;
-      if (flags.yes) runIt = true;
+      if (flags.acceptPostCreate) runIt = true;
+      else if (flags.yes) runIt = false; // --yes no longer auto-runs postCreate; use --accept-postcreate
       else {
         const promptAnswer = await inquirer.prompt([
           { type: 'confirm', name: 'runPost', message: `This template provides a post-create script (${choice.postCreate}). Run it now?`, default: false }
@@ -395,10 +513,32 @@ async function main() {
     const dest = path.resolve(process.cwd(), projectName);
     let tmp = null;
     try {
-      tmp = await cloneGitTemplateToTemp(choice.source);
+        // if CLI-level timeout present, prefer it when source.timeout not set
+        if (flags.timeout && choice.source && !choice.source.timeout) choice.source.timeout = flags.timeout;
+        tmp = await cloneGitTemplateToTemp(choice.source);
       // tmp now contains repo contents (possibly whole repo) - if source.path was provided degit should have checked it out
       await sharedCopy(tmp, dest);
       console.log(chalk.green(`Project created at: ${dest}`));
+      // post-create hook for git-sourced templates
+      if (choice.postCreate) {
+        let runIt = false;
+        if (flags.acceptPostCreate) runIt = true;
+        else if (flags.yes) runIt = false;
+        else {
+          const promptAnswer = await inquirer.prompt([
+            { type: 'confirm', name: 'runPost', message: `This template provides a post-create script (${choice.postCreate}). Run it now?`, default: false }
+          ]);
+          runIt = promptAnswer.runPost;
+        }
+        if (runIt) {
+          console.log(chalk.blue(`Running post-create script: ${choice.postCreate}`));
+          try {
+            await runPostCreateScript(dest, choice.postCreate, []);
+          } catch (err) {
+            console.error(chalk.red('post-create script failed:'), err);
+          }
+        }
+      }
     } catch (err) {
       console.error(chalk.red('Failed to fetch/copy git template:'), err);
       await cleanupTmpDirs();

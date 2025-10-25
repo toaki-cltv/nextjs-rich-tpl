@@ -1,0 +1,28 @@
+name: Validate remote templates index
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  validate-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install workspace deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate remote index against schema
+        env:
+          REMOTE_INDEX_URL: https://raw.githubusercontent.com/${{ github.repository }}/main/templates/index.json
+        run: |
+          node ./scripts/validate-index.mjs
