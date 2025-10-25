@@ -1,9 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { spawnSync } from "child_process";
-import fsSync from 'fs';
 import cliProgress from 'cli-progress';
-import chalk from 'chalk';
 
 export async function copyRecursive(src, dest, options = {}) {
   const { skip = ["node_modules", ".git"], showProgress = true } = options;

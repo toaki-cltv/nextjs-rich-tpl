@@ -1,40 +1,48 @@
-<p align="center">
-  <a href="https://nextjs-rich-tpl.cltv.toaki.cc/">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://assets.vercel.com/image/upload/v1662130559/nextjs/Icon_dark_background.png">
-      <img src="https://assets.vercel.com/image/upload/v1662130559/nextjs/Icon_light_background.png" height="128">
-    </picture>
-    <h1 align="center">Next.js リッチテンプレート</h1>
-  </a>
-</p>
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://assets.vercel.com/image/upload/v1662130559/nextjs/Icon_dark_background.png">
+    <img src="https://assets.vercel.com/image/upload/v1662130559/nextjs/Icon_light_background.png" height="128">
+  </picture>
+  <h1 align="center">Next.js リッチテンプレート</h1>
+</div>
 
-<p align="center">
+<div align="center">
   <a aria-label="Vercel logo" href="https://vercel.com">
-    <img src="https://img.shields.io/badge/MADE%20BY%20Vercel-000000.svg?style=for-the-badge&logo=Vercel&labelColor=000">
+    <img src="https://img.shields.io/badge/MADE%20BY%20TOAKI-000000.svg?style=for-the-badge&logo=github&labelColor=000">
   </a>
-  <a aria-label="NPM version" href="https://www.npmjs.com/package/next/">
-    <img alt="NPM version" src="https://img.shields.io/npm/v/next?style=for-the-badge&label=NPM&labelColor=black">
+  <a aria-label="NPM version" href="https://www.npmjs.com/package/create-next-rich-tpl/">
+    <img alt="NPM version" src="https://img.shields.io/npm/v/create-next-rich-tpl?style=for-the-badge&label=NPM&labelColor=black">
   </a>
   <a aria-label="License" href="https://github.com/toaki-cltv/nextjs-rich-tpl/blob/main/LICENSE.txt">
     <img alt="License" src="https://img.shields.io/github/license/toaki-cltv/nextjs-rich-tpl?style=for-the-badge&labelColor=000000">
   </a>
-</p>
+</div>
 
-<p align="center">
+<div align="center">
+  <a href="https://github.com/toaki-cltv/nextjs-rich-tpl/releases/latest">
+    <img alt="Release version" src="https://img.shields.io/github/v/release/toaki-cltv/nextjs-rich-tpl?style=for-the-badge&labelColor=000">
+  </a>
+  <a href="https://github.com/toaki-cltv/nextjs-rich-tpl/commits">
+    <img alt="Commit activity" src="https://img.shields.io/github/commit-activity/t/toaki-cltv/nextjs-rich-tpl?style=for-the-badge&labelColor=000">
+  </a>
+  <img alt="Last commit" src="https://img.shields.io/github/last-commit/toaki-cltv/nextjs-rich-tpl?style=for-the-badge&labelColor=000">
+  <a href="https://github.com/toaki-cltv/nextjs-rich-tpl/issues">
+    <img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues/toaki-cltv/nextjs-rich-tpl?style=for-the-badge&labelColor=000">
+  </a>
+  <a href="https://github.com/toaki-cltv/nextjs-rich-tpl/pulls">
+    <img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues-pr/toaki-cltv/nextjs-rich-tpl?style=for-the-badge&labelColor=000">
+  </a>
+</div>
+
+<br/>
+
+<div align="center">
   <a aria-label="README - English" href="https://github.com/toaki-cltv/nextjs-rich-tpl/blob/main/README/en.md">
     <img alt="README - English" src="https://img.shields.io/badge/English-blue?style=for-the-badge">
   </a>
   <a aria-label="README - 日本語" href="https://github.com/toaki-cltv/nextjs-rich-tpl/blob/main/README/ja.md">
     <img alt="README - 日本語" src="https://img.shields.io/badge/日本語-blue?style=for-the-badge">
   </a>
-</p>
-
-<div align="center">
-  <img alt="Release version" src="https://img.shields.io/github/v/release/toaki-cltv/nextjs-rich-tpl">
-  <img alt="Commit activity" src="https://img.shields.io/github/commit-activity/t/toaki-cltv/nextjs-rich-tpl">
-  <img alt="Last commit" src="https://img.shields.io/github/last-commit/toaki-cltv/nextjs-rich-tpl">
-  <img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues/toaki-cltv/nextjs-rich-tpl">
-  <img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues-pr/toaki-cltv/nextjs-rich-tpl">
 </div>
 
 # Next.js リッチテンプレート
@@ -68,7 +76,7 @@
 プロジェクトを作成するには、以下のコマンドを実行します。
 
 ```bash
-npx nextjs-rich-tpl
+npx create next-rich-tpl@latest
 ```
 
 コマンドを実行すると、次の手順が表示されます：
