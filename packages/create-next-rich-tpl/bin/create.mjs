@@ -416,26 +416,41 @@ async function computeDirSha256(dir, options = {}) {
 async function main() {
   const repoRoot = repoRootFromBinDir();
   // remote index URL (env or package.json config)
+  // Behavior: when running inside the repository prefer the repo's `templates/index.json` (no remote fetch).
+  // When running via dlx/npx (no repo templates present), fall back to the installed package's package.json config.
   let remoteIndexUrl = process.env.CREATE_TEMPLATES_INDEX_URL;
-  if (!remoteIndexUrl) {
-    // Prefer the installed package's own package.json (works when run via npx/pnpm dlx).
+  const repoIndexPath = path.join(repoRoot, 'templates', 'index.json');
+  // If repo has index.json, prefer it: don't set remoteIndexUrl so loadTemplatesIndex will read it.
+  try {
+    if (!remoteIndexUrl && fsSync.existsSync(repoIndexPath)) {
+      remoteIndexUrl = undefined; // explicit: use local index
+    } else if (!remoteIndexUrl) {
+      // no repo index, try the installed package (useful for dlx)
+      try {
+        const ownPkgRaw = await fs.readFile(path.join(__dirname, '..', 'package.json'), 'utf8');
+        const ownPkg = JSON.parse(ownPkgRaw);
+        if (ownPkg && ownPkg.config && ownPkg.config.templatesIndexUrl) remoteIndexUrl = ownPkg.config.templatesIndexUrl;
+      } catch (e) {
+        // ignore
+      }
+      // finally try repo root package.json as a last resort
+      if (!remoteIndexUrl) {
+        try {
+          const rootPkgRaw = await fs.readFile(path.join(repoRoot, 'package.json'), 'utf8');
+          const rootPkg = JSON.parse(rootPkgRaw);
+          if (rootPkg && rootPkg.config && rootPkg.config.templatesIndexUrl) remoteIndexUrl = rootPkg.config.templatesIndexUrl;
+        } catch (e) {
+          // ignore
+        }
+      }
+    }
+  } catch (e) {
+    // if fsSync.existsSync fails for some reason, fall back to previous behavior
     try {
       const ownPkgRaw = await fs.readFile(path.join(__dirname, '..', 'package.json'), 'utf8');
       const ownPkg = JSON.parse(ownPkgRaw);
       if (ownPkg && ownPkg.config && ownPkg.config.templatesIndexUrl) remoteIndexUrl = ownPkg.config.templatesIndexUrl;
-    } catch (e) {
-      // ignore
-    }
-    // Fallback to repository root package.json (useful when running from source inside the repo)
-    if (!remoteIndexUrl) {
-      try {
-        const rootPkgRaw = await fs.readFile(path.join(repoRoot, 'package.json'), 'utf8');
-        const rootPkg = JSON.parse(rootPkgRaw);
-        if (rootPkg && rootPkg.config && rootPkg.config.templatesIndexUrl) remoteIndexUrl = rootPkg.config.templatesIndexUrl;
-      } catch (e) {
-        // ignore
-      }
-    }
+    } catch (e2) {}
   }
 
   // try remote fetch if configured, then local index, then filesystem
