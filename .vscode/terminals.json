@@ -15,6 +15,12 @@
       "open": true
     },
     {
+      "name": "Create Command",
+      "description": "Create-next-rich-tpl terminal",
+      "cwd": "./packages/create-next-rich-tpl",
+      "open": true
+    },
+    {
       "name": "1: with-i18n-routing",
       "description": "Template with i18n routing",
       "cwd": "./templates/app/with-i18n-routing",
