@@ -1,13 +1,19 @@
 {
   "name": "create-next-rich-tpl",
-  "version": "0.0.1-beta.0",
+  "version": "0.0.1-beta.1",
   "description": "Central create command that lists available templates and delegates to per-template create packages or local templates",
   "type": "module",
   "bin": {
     "create-next-rich-tpl": "bin/create.mjs"
   },
-  "files": ["bin/"],
-  "keywords": ["create", "template", "nextjs"],
+  "files": [
+    "bin/"
+  ],
+  "keywords": [
+    "create",
+    "template",
+    "nextjs"
+  ],
   "license": "MIT",
   "author": "toaki-cltv",
   "repository": {
@@ -15,7 +21,8 @@
     "url": "git+https://github.com/toaki-cltv/nextjs-rich-tpl.git"
   },
   "scripts": {
-    "test": "node -e \"console.log('no tests')\""
+    "test": "node -e \"console.log('no tests')\"",
+    "pre": "version prerelease --preid=beta -m 'chore(release): %s'"
   },
   "dependencies": {
     "inquirer": "^9.2.7",
