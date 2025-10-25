@@ -3,8 +3,18 @@ name: Smoke tests
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'templates/**'
+      - 'scripts/**'
+      - 'packages/create-next-rich-tpl/**'
+      - '.github/workflows/smoke-test.yml'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'templates/**'
+      - 'scripts/**'
+      - 'packages/create-next-rich-tpl/**'
+      - '.github/workflows/smoke-test.yml'
 
 jobs:
   smoke-test:

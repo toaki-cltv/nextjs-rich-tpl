@@ -4,6 +4,11 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
+    paths:
+      - 'templates/index.json'
+      - 'packages/create-next-rich-tpl/bin/index.schema.json'
+      - 'scripts/validate-index.mjs'
+      - '.github/workflows/validate-remote-index.yml'
 
 jobs:
   validate-index:
