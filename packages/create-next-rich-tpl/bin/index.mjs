@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { spawnSync } from "child_process";
 
 export async function copyRecursive(src, dest, options = {}) {
   const { skip = ["node_modules", ".git"] } = options;
@@ -38,17 +39,49 @@ export async function ensureInquirerAndChalk() {
 }
 
 export async function runPostCreateScript(pkgDir, scriptRelPath, args = []) {
-  // Very small helper: run a local node script inside the package dir
+  // If scriptRelPath points to a JS file, run it with node. Otherwise, attempt `npm run <scriptRelPath>`.
   const scriptPath = path.join(pkgDir, scriptRelPath);
   try {
-    // dynamic import to run script
-    const mod = await import(pathToFileURL(scriptPath).href);
-    if (typeof mod.default === "function") {
-      await mod.default(...args);
+    // prefer file execution when present
+    try {
+      const st = await fs.stat(scriptPath);
+      if (st.isFile()) {
+        const nodeExe = process.execPath;
+        const r = spawnSync(nodeExe, [scriptPath, ...args], { stdio: 'inherit', cwd: pkgDir });
+        if (r.status !== 0) {
+          throw new Error(`postCreate script exited with ${r.status}`);
+        }
+        return;
+      }
+    } catch (e) {
+      // file not found -> fallthrough to npm script
     }
+
+    // Decide preferred package runner: prefer pnpm if available in PATH, else npm
+    const runnersTried = [];
+    function hasRunner(cmd) {
+      try {
+        const s = spawnSync(cmd, ['--version'], { stdio: 'ignore' });
+        return s.status === 0;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    const preferPnpm = hasRunner('pnpm');
+    const runnerOrder = preferPnpm ? ['pnpm', 'npm'] : ['npm', 'pnpm'];
+    for (const runTool of runnerOrder) {
+      try {
+        const r = spawnSync(runTool, ['run', scriptRelPath, '--silent'], { stdio: 'inherit', cwd: pkgDir });
+        runnersTried.push({ tool: runTool, code: r.status });
+        if (r.status === 0) return;
+      } catch (e) {
+        runnersTried.push({ tool: runTool, code: 'err', err: String(e) });
+      }
+    }
+    throw new Error(`postCreate script failed; attempts: ${JSON.stringify(runnersTried)}`);
   } catch (err) {
     console.error("Failed to run postCreate script:", err);
+    throw err;
   }
 }
-
-import { pathToFileURL } from "url";

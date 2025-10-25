@@ -1,0 +1,30 @@
+name: PostCreate CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  postcreate-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install workspace deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Run create with ci-postcreate template (auto-run postCreate)
+        run: |
+          node ./packages/create-next-rich-tpl/bin/create.mjs --template app/ci-postcreate --name postcreate-app --yes --verbose
+
+      - name: Verify marker file was written by post-create
+        run: |
+          test -f postcreate-app/POSTCREATE_RAN || (ls -la postcreate-app && exit 2)

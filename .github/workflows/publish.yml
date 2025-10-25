@@ -1,0 +1,49 @@
+name: Publish package
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies (root)
+        run: pnpm install --frozen-lockfile
+
+      - name: Run smoke tests
+        run: node ./scripts/smoke-test.js
+
+      - name: Extract version from tag
+        shell: bash
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
+      - name: Update package.json version
+        run: |
+          node -e "const fs=require('fs');const p='./packages/create-next-rich-tpl/package.json';const j=JSON.parse(fs.readFileSync(p));j.version=process.env.VERSION;fs.writeFileSync(p,JSON.stringify(j,null,2));console.log('Updated',p,'to',process.env.VERSION);"
+
+      - name: Publish package (pnpm)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd packages/create-next-rich-tpl
+          pnpm publish --access public --no-git-checks

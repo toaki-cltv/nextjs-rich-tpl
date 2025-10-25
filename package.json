@@ -19,4 +19,8 @@
     "chalk": "^5.6.2",
     "inquirer": "^12.10.0"
   }
+  ,
+  "config": {
+    "templatesIndexUrl": "https://raw.githubusercontent.com/toaki-cltv/nextjs-rich-tpl/main/templates/index.json"
+  }
 }

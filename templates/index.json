@@ -21,5 +21,14 @@
       "source": { "type": "local", "path": "templates/app/without-i18n-routing" },
       "tags": ["nextjs", "routing"]
     }
+    ,
+    {
+      "id": "app/ci-postcreate",
+      "title": "CI: postCreate test template",
+      "description": "A minimal template used by CI to test post-create script execution",
+      "source": { "type": "local", "path": "templates/app/ci-postcreate" },
+      "postCreate": "post-create.js",
+      "tags": ["ci","test"]
+    }
   ]
 }

@@ -12,7 +12,7 @@
   "author": "toaki-cltv",
   "repository": {
     "type": "git",
-    "url": "https://github.com/toaki-cltv/nextjs-rich-tpl.git"
+    "url": "git+https://github.com/toaki-cltv/nextjs-rich-tpl.git"
   },
   "scripts": {
     "test": "node -e \"console.log('no tests')\""
