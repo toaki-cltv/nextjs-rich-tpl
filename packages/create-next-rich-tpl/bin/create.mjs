@@ -6,6 +6,8 @@ import fs from "fs/promises";
 import { spawn, spawnSync } from "child_process";
 import os from "os";
 
+import { Command } from 'commander';
+
 import { ensureInquirerAndChalk, copyRecursive as sharedCopy, runPostCreateScript } from "./index.mjs";
 import crypto from 'crypto';
 import Ajv from 'ajv';
@@ -397,19 +399,40 @@ let inquirer;
 let chalk;
 
 // simple arg parsing for non-interactive use
-const argv = process.argv.slice(2);
-const flags = {};
-for (let i = 0; i < argv.length; i++) {
-  const a = argv[i];
-  if (a === '--yes' || a === '-y') flags.yes = true;
-  else if (a === '--verbose' || a === '-v') flags.verbose = true;
-  else if (a === '--template' && argv[i+1]) { flags.template = argv[++i]; }
-  else if (a === '--name' && argv[i+1]) { flags.name = argv[++i]; }
-  else if (a === '--timeout' && argv[i+1]) { flags.timeout = parseInt(argv[++i], 10); }
-  else if (a === '--accept-postcreate' || a === '-a') flags.acceptPostCreate = true;
-    else if (a === '--wait-cleanup') flags.waitCleanup = true;
-    else if (a === '--no-background-cleanup') flags.waitCleanup = true;
+// Use commander for argument parsing and help generation
+const program = new Command();
+try {
+  // try to read package version to show in help
+  const pkgRaw = fsSync.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8');
+  const pkg = JSON.parse(pkgRaw);
+  program.name(pkg.name || 'create-next-rich-tpl').version(pkg.version || '0.0.0');
+} catch (e) {
+  program.name('create-next-rich-tpl').version('0.0.0');
 }
+
+program
+  .description('Create a Next.js project from templates')
+  .option('-v, --verbose', 'Verbose logging')
+  .option('-y, --yes', 'Accept defaults (does NOT auto-run post-create)')
+  .option('--template <id|name>', 'Select template non-interactively')
+  .option('--name <project-name>', 'Project destination name (non-interactive)')
+  .option('-a, --accept-postcreate', 'Opt in to run template post-create scripts')
+  .option('--wait-cleanup', 'Wait for temporary cleanup and show spinner/progress')
+  .option('--no-background-cleanup', 'Alias for --wait-cleanup (legacy)')
+  .option('--timeout <ms>', 'Override network/clone timeout in milliseconds', (v) => parseInt(v, 10));
+
+program.parse(process.argv);
+const programOpts = program.opts();
+const argv = program.args || [];
+const flags = {
+  verbose: !!programOpts.verbose,
+  yes: !!programOpts.yes,
+  template: programOpts.template,
+  name: programOpts.name,
+  timeout: programOpts.timeout,
+  acceptPostCreate: !!programOpts.acceptPostcreate || !!programOpts.acceptPostCreate,
+  waitCleanup: !!programOpts.waitCleanup || !!programOpts.noBackgroundCleanup,
+};
 
 // function debugLog(...args) {
 //   if (flags.verbose || process.env.DEBUG) console.debug('[debug]', ...args);
@@ -509,6 +532,17 @@ async function main() {
 
   const pkgs = await findCreatePackages(repoRoot);
   const items = [...(Array.isArray(mappedEntries) ? mappedEntries : []), ...pkgs];
+
+  // Support 'help' subcommand: `create-next-rich-tpl help`
+  if (argv.length > 0 && argv[0] === 'help') {
+    printHelp();
+    process.exit(0);
+  }
+
+  if (flags.help) {
+    printHelp();
+    process.exit(0);
+  }
 
   if (items.length === 0) {
     console.log("No templates or create-* packages found in this repository.");
