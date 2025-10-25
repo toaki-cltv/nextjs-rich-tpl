@@ -1,0 +1,34 @@
+{
+  "templates": [
+    {
+      "id": "app/with-i18n-routing",
+      "title": "Next.js app with i18n routing",
+      "description": "Next.js template with i18n routing and translation scaffolding",
+      "source": { "type": "local", "path": "templates/app/with-i18n-routing" },
+      "tags": ["nextjs", "i18n"]
+    },
+    {
+      "id": "app/without-i18n",
+      "title": "Next.js app (no i18n)",
+      "description": "A minimal Next.js template without internationalization setup",
+      "source": { "type": "local", "path": "templates/app/without-i18n" },
+      "tags": ["nextjs", "minimal"]
+    },
+    {
+      "id": "app/without-i18n-routing",
+      "title": "Next.js app without i18n routing",
+      "description": "Starter without i18n routing; includes layout and basic pages",
+      "source": { "type": "local", "path": "templates/app/without-i18n-routing" },
+      "tags": ["nextjs", "routing"]
+    }
+    ,
+    {
+      "id": "app/ci-postcreate",
+      "title": "CI: postCreate test template",
+      "description": "A minimal template used by CI to test post-create script execution",
+      "source": { "type": "local", "path": "templates/app/ci-postcreate" },
+      "postCreate": "post-create.js",
+      "tags": ["ci","test"]
+    }
+  ]
+}

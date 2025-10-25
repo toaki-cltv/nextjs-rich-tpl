@@ -1,6 +1,7 @@
+import "./globals.css";
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 
 // config
 import siteConfig from "../../../richtpl.config";
@@ -68,8 +69,9 @@ export async function generateMetadata({
     for (const locale of siteConfig.i18n.locales) {
       const localeConfig = siteConfig.i18n.localeConfigs[locale];
       const cleanPath = path.replace(`/${locale}`, ""); // Remove current locale from path
-      alternates.languages[localeConfig.htmlLang] =
-        `${siteConfig.url}/${localeConfig.path}${cleanPath}`;
+      alternates.languages[
+        localeConfig.htmlLang
+      ] = `${siteConfig.url}/${localeConfig.path}${cleanPath}`;
     }
 
     return alternates;
@@ -80,16 +82,16 @@ export async function generateMetadata({
   const title = t.has(`title.default`)
     ? t(`title.default`)
     : t.has(`title`)
-      ? t(`title`)
-      : typeof titleData === "string"
-        ? titleData
-        : titleData && "default" in titleData
-          ? titleData.default
-          : titleData && "absolute" in titleData
-            ? titleData.absolute
-            : siteConfig.title
-              ? siteConfig.title
-              : "Next.js Rich Tpl";
+    ? t(`title`)
+    : typeof titleData === "string"
+    ? titleData
+    : titleData && "default" in titleData
+    ? titleData.default
+    : titleData && "absolute" in titleData
+    ? titleData.absolute
+    : siteConfig.title
+    ? siteConfig.title
+    : "Next.js Rich Tpl";
 
   const description =
     (t.has(`description`) && t(`description`)) ||
@@ -120,7 +122,7 @@ export async function generateMetadata({
         siteConfig.themeConfig.image,
       locale:
         siteConfig.themeConfig?.metadata?.openGraph?.locale ??
-        siteConfig.i18n.localeConfigs[locale].htmlLang ??
+        siteConfig.i18n.localeConfigs[locale]?.htmlLang ??
         "ja-JP",
     },
     twitter: {
@@ -133,15 +135,13 @@ export async function generateMetadata({
     },
     ...siteConfig.themeConfig?.metadata,
     metadataBase: new URL(
-      origin ??
-        siteConfig.themeConfig?.metadata?.metadataBase ??
-        siteConfig.url,
+      origin ?? siteConfig.themeConfig?.metadata?.metadataBase ?? siteConfig.url
     ),
   };
 }
 
-export default async function LocaleLayout({ children, params }: LayoutProps) {
-  const { locale } = await params;
+export default async function LocaleLayout(props: LayoutProps) {
+  const { locale } = await props.params;
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
@@ -165,7 +165,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
           <NextIntlClientProvider messages={messages}>
             <SmoothScrollProvider>
               <Toaster />
-              {children}
+              {props.children}
             </SmoothScrollProvider>
           </NextIntlClientProvider>
         </ThemeProvider>

@@ -1,0 +1,33 @@
+name: Remote index CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  remote-index-create:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install workspace deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Use remote index (raw) and run create non-interactive
+        env:
+          CREATE_TEMPLATES_INDEX_URL: https://raw.githubusercontent.com/${{ github.repository }}/main/templates/index.json
+        run: |
+          node ./packages/create-next-rich-tpl/bin/create.mjs --template app/with-i18n-routing --name ci-remote-app --yes --verbose
+
+      - name: Verify created project
+        run: |
+          test -d ci-remote-app || (ls -la && exit 2)
+          test -f ci-remote-app/package.json || (ls -la ci-remote-app && exit 3)

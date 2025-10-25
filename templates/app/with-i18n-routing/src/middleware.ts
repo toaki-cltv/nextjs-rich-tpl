@@ -1,17 +1,20 @@
-import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
+import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 
-// 既存のミドルウェアを作成
 const intlMiddleware = createMiddleware(routing);
 
-export function middleware(request: NextRequest) {
-  // intlMiddleware を実行して、結果を取得
-  let response = intlMiddleware(request);
+export async function middleware(request: NextRequest) {
+  let response: any;
+  if (typeof intlMiddleware === "function") {
+    response = intlMiddleware(request);
+  } else {
+    response = undefined;
+  }
 
-  // intlMiddleware がレスポンスを返さなかった場合、デフォルトのNextResponseを作成
   if (!response) {
-    response = NextResponse.next();
+    const i18nUnavailable = new URL("/i18n-unavailable", request.url);
+    return NextResponse.rewrite(i18nUnavailable);
   }
 
   // カスタムヘッダーを追加する処理

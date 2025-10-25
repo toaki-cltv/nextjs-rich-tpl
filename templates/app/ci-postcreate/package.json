@@ -1,0 +1,10 @@
+{
+  "name": "ci-postcreate-template",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Minimal template used by CI to test post-create execution",
+  "license": "MIT",
+  "scripts": {
+    "postcreate": "node post-create.js"
+  }
+}

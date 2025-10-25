@@ -12,7 +12,7 @@ const siteConfig: siteConfigType = {
   favicon: "/favicon.ico",
 
   // Production URL of the site
-  url: "https://nextjs-rich-tpl.toakiryu.com",
+  url: "https://nextjs-rich-tpl.toaki.cc",
 
   // Base URL pathname (for GitHub Pages deployment)
   baseUrl: "/",
@@ -20,7 +20,7 @@ const siteConfig: siteConfigType = {
   title: "nextjs-rich-tpl",
 
   // GitHub deployment configuration
-  organizationName: "toakiryu", // GitHub organization/user name
+  organizationName: "toaki-cltv", // GitHub organization/user name
   projectName: "nextjs-rich-tpl", // GitHub repository name
 
   // Internationalization (i18n) configuration
