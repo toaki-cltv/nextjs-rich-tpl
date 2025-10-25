@@ -113,7 +113,12 @@ let _ajvValidate = null;
 function initAjvValidator() {
   if (_ajvValidate) return _ajvValidate;
   try {
-    const schemaPath = path.join(repoRootFromBinDir(), 'templates', 'index.schema.json');
+    // Prefer a schema shipped with the published package (next to the bin files).
+    // Fallback to the repository templates/index.schema.json when running in-source.
+    let schemaPath = path.join(__dirname, 'index.schema.json');
+    if (!fsSync.existsSync(schemaPath)) {
+      schemaPath = path.join(repoRootFromBinDir(), 'templates', 'index.schema.json');
+    }
     const raw = fsSync.readFileSync(schemaPath, 'utf8');
     const schema = JSON.parse(raw);
     const ajv = new Ajv({ allErrors: true });
@@ -416,26 +421,65 @@ async function computeDirSha256(dir, options = {}) {
 async function main() {
   const repoRoot = repoRootFromBinDir();
   // remote index URL (env or package.json config)
+  // Behavior: when running inside the repository prefer the repo's `templates/index.json` (no remote fetch).
+  // When running via dlx/npx (no repo templates present), fall back to the installed package's package.json config.
   let remoteIndexUrl = process.env.CREATE_TEMPLATES_INDEX_URL;
-  if (!remoteIndexUrl) {
-    try {
-      const rootPkgRaw = await fs.readFile(path.join(repoRoot, 'package.json'), 'utf8');
-      const rootPkg = JSON.parse(rootPkgRaw);
-      if (rootPkg && rootPkg.config && rootPkg.config.templatesIndexUrl) remoteIndexUrl = rootPkg.config.templatesIndexUrl;
-    } catch (e) {
-      // ignore
+  // If repo has index.json, prefer it: don't set remoteIndexUrl so loadTemplatesIndex will read it.
+  try {
+    if (!remoteIndexUrl && fsSync.existsSync(path.join(repoRoot, 'templates', 'index.json'))) {
+      remoteIndexUrl = undefined; // explicit: use local index
+    } else if (!remoteIndexUrl) {
+      // no repo index, try the installed package (useful for dlx)
+      try {
+        const ownPkgRaw = await fs.readFile(path.join(__dirname, '..', 'package.json'), 'utf8');
+        const ownPkg = JSON.parse(ownPkgRaw);
+        if (ownPkg && ownPkg.config && ownPkg.config.templatesIndexUrl) remoteIndexUrl = ownPkg.config.templatesIndexUrl;
+      } catch (e) {
+        // ignore
+      }
+      // finally try repo root package.json as a last resort
+      if (!remoteIndexUrl) {
+        try {
+          const rootPkgRaw = await fs.readFile(path.join(repoRoot, 'package.json'), 'utf8');
+          const rootPkg = JSON.parse(rootPkgRaw);
+          if (rootPkg && rootPkg.config && rootPkg.config.templatesIndexUrl) remoteIndexUrl = rootPkg.config.templatesIndexUrl;
+        } catch (e) {
+          // ignore
+        }
+      }
     }
+  } catch (e) {
+    // if fsSync.existsSync fails for some reason, fall back to previous behavior
+    try {
+      const ownPkgRaw = await fs.readFile(path.join(__dirname, '..', 'package.json'), 'utf8');
+      const ownPkg = JSON.parse(ownPkgRaw);
+      if (ownPkg && ownPkg.config && ownPkg.config.templatesIndexUrl) remoteIndexUrl = ownPkg.config.templatesIndexUrl;
+    } catch (e2) {}
   }
 
-  // try remote fetch if configured, then local index, then filesystem
-  let indexed = null;
-  if (remoteIndexUrl) {
-    indexed = await fetchRemoteIndex(remoteIndexUrl, repoRoot, { timeout: flags.timeout || 3000 });
+  // Decide whether we're running against a local checkout.
+  const repoIndexPath = path.join(repoRoot, 'templates', 'index.json');
+  const isLocalRun = fsSync.existsSync(repoIndexPath);
+
+  // Collect templates depending on local vs non-local run.
+  let mappedEntries = null;
+  if (isLocalRun) {
+    // When running inside the repo, prefer the repo index (which may contain both local and git entries).
+    mappedEntries = await loadTemplatesIndex(repoRoot);
+    if (!Array.isArray(mappedEntries) || mappedEntries.length === 0) {
+      // Fallback to scanning templates/app
+      mappedEntries = await findLocalTemplates(repoRoot);
+    }
+  } else {
+    // Not a local run (e.g., dlx/npx). Try remote index first (if configured), otherwise attempt to read any index available.
+    if (remoteIndexUrl) mappedEntries = await fetchRemoteIndex(remoteIndexUrl, repoRoot, { timeout: flags.timeout || 3000 });
+    if (!mappedEntries) mappedEntries = await loadTemplatesIndex(repoRoot);
+    // When not local, hide any 'local' entries because their paths won't exist in the runtime environment.
+    if (Array.isArray(mappedEntries)) mappedEntries = mappedEntries.filter((e) => e.type === 'git');
   }
-  if (!indexed) indexed = await loadTemplatesIndex(repoRoot);
-  const local = Array.isArray(indexed) && indexed.length > 0 ? indexed : await findLocalTemplates(repoRoot);
+
   const pkgs = await findCreatePackages(repoRoot);
-  const items = [...local, ...pkgs];
+  const items = [...(Array.isArray(mappedEntries) ? mappedEntries : []), ...pkgs];
 
   if (items.length === 0) {
     console.log("No templates or create-* packages found in this repository.");
@@ -444,7 +488,14 @@ async function main() {
 
   ({ inquirer, chalk } = await ensureInquirerAndChalk());
 
-  const choices = items.map((it) => ({ name: it.title, value: it }));
+  const choices = items.map((it) => {
+    // Build a human-friendly label that indicates the template source type.
+    let typeLabel = it.type || 'unknown';
+    if (it.type === 'git' && it.source && it.source.repo) typeLabel = `git:${it.source.repo}`;
+    if (it.type === 'package' && it.name) typeLabel = `pkg:${it.name}`;
+    const label = `${it.title} [${typeLabel}]`;
+    return { name: label, value: it };
+  });
   let choice = null;
   let projectName = null;
 
