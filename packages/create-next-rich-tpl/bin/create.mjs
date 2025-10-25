@@ -418,12 +418,23 @@ async function main() {
   // remote index URL (env or package.json config)
   let remoteIndexUrl = process.env.CREATE_TEMPLATES_INDEX_URL;
   if (!remoteIndexUrl) {
+    // Prefer the installed package's own package.json (works when run via npx/pnpm dlx).
     try {
-      const rootPkgRaw = await fs.readFile(path.join(repoRoot, 'package.json'), 'utf8');
-      const rootPkg = JSON.parse(rootPkgRaw);
-      if (rootPkg && rootPkg.config && rootPkg.config.templatesIndexUrl) remoteIndexUrl = rootPkg.config.templatesIndexUrl;
+      const ownPkgRaw = await fs.readFile(path.join(__dirname, '..', 'package.json'), 'utf8');
+      const ownPkg = JSON.parse(ownPkgRaw);
+      if (ownPkg && ownPkg.config && ownPkg.config.templatesIndexUrl) remoteIndexUrl = ownPkg.config.templatesIndexUrl;
     } catch (e) {
       // ignore
+    }
+    // Fallback to repository root package.json (useful when running from source inside the repo)
+    if (!remoteIndexUrl) {
+      try {
+        const rootPkgRaw = await fs.readFile(path.join(repoRoot, 'package.json'), 'utf8');
+        const rootPkg = JSON.parse(rootPkgRaw);
+        if (rootPkg && rootPkg.config && rootPkg.config.templatesIndexUrl) remoteIndexUrl = rootPkg.config.templatesIndexUrl;
+      } catch (e) {
+        // ignore
+      }
     }
   }
 
