@@ -1,6 +1,6 @@
 {
   "name": "create-next-rich-tpl",
-  "version": "0.0.1-beta.5",
+  "version": "0.0.1-beta.6",
   "description": "Central create command that lists available templates and delegates to per-template create packages or local templates",
   "type": "module",
   "bin": {
@@ -28,7 +28,9 @@
     "inquirer": "^9.2.7",
     "chalk": "^5.2.0",
     "degit": "^2.8.4",
-    "ajv": "^8.12.0"
+    "ajv": "^8.12.0",
+    "ora": "^6.1.2",
+    "cli-progress": "^3.12.0"
   },
   "config": {
     "templatesIndexUrl": "https://raw.githubusercontent.com/toaki-cltv/nextjs-rich-tpl/main/templates/index.json"
