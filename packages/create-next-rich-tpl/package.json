@@ -33,7 +33,7 @@
     "ajv": "^8.12.0",
     "ora": "^9.0.0",
     "cli-progress": "^3.12.0",
-    "commander": "^10.0.0"
+    "commander": "^14.0.2"
   },
   "config": {
     "templatesIndexUrl": "https://raw.githubusercontent.com/toaki-cltv/nextjs-rich-tpl/main/templates/index.json"
