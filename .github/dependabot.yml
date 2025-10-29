@@ -5,38 +5,92 @@
 
 version: 2
 updates:
-  # ルートのウェブサイトの依存関係をチェック
+  # ルートの依存関係をチェック
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "daily"
     groups:
       tar-updates:
-        applies-to: version-updates
         patterns:
           - "tar"
 
-  # CLI とテンプレートの依存関係を一括チェック
+  # packages/create-next-rich-tpl の依存関係
   - package-ecosystem: "npm"
-    directory: "/packages/nextjs-rich-tpl"
+    directory: "/packages/create-next-rich-tpl"
     schedule:
       interval: "daily"
     groups:
       tar-updates:
-        applies-to: version-updates
         patterns:
           - "tar"
 
-  # テンプレートの依存関係を一括でチェック
+  # 各テンプレートの依存関係: Dependabot は各 directory エントリを個別に評価します
   - package-ecosystem: "npm"
-    directories:
-      - "/templates/app/with-i18n-routing"
-      - "/templates/app/without-i18n"
-      - "/templates/app/without-i18n-routing"
+    directory: "/templates/app/with-i18n-routing"
     schedule:
       interval: "daily"
     groups:
       tar-updates:
-        applies-to: version-updates
         patterns:
           - "tar"
+      react-family:
+        patterns:
+          - "^react$"
+          - "^react-dom$"
+          - "^@types/react$"
+          - "^@types/react-dom$"
+      next-family:
+        patterns:
+          - "^next$"
+          - "^eslint-config-next$"
+      tailwindcss-family:
+        patterns:
+          - "^tailwindcss$"
+          - "^@tailwindcss/postcss$"
+
+  - package-ecosystem: "npm"
+    directory: "/templates/app/without-i18n"
+    schedule:
+      interval: "daily"
+    groups:
+      tar-updates:
+        patterns:
+          - "tar"
+      react-family:
+        patterns:
+          - "^react$"
+          - "^react-dom$"
+          - "^@types/react$"
+          - "^@types/react-dom$"
+      next-family:
+        patterns:
+          - "^next$"
+          - "^eslint-config-next$"
+      tailwindcss-family:
+        patterns:
+          - "^tailwindcss$"
+          - "^@tailwindcss/postcss$"
+
+  - package-ecosystem: "npm"
+    directory: "/templates/app/without-i18n-routing"
+    schedule:
+      interval: "daily"
+    groups:
+      tar-updates:
+        patterns:
+          - "tar"
+      react-family:
+        patterns:
+          - "^react$"
+          - "^react-dom$"
+          - "^@types/react$"
+          - "^@types/react-dom$"
+      next-family:
+        patterns:
+          - "^next$"
+          - "^eslint-config-next$"
+      tailwindcss-family:
+        patterns:
+          - "^tailwindcss$"
+          - "^@tailwindcss/postcss$"
