@@ -6,7 +6,8 @@
   "scripts": {
     "cleanup": "node ./scripts/cleanMacJunkFiles.mjs",
     "clean": "node ./clean.mjs",
-    "smoke-test": "node ./scripts/smoke-test.js"
+    "smoke-test": "node ./scripts/smoke-test.js",
+    "check:latest": "node ./scripts/check-latest.js"
   },
   "license": "MIT",
   "engines": {
