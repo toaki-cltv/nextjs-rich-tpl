@@ -27,7 +27,7 @@ import siteConfig from "../../richtpl.config";
 import { headers } from "next/headers";
 
 import { Toaster } from "sonner";
-import { ThemeProvider } from "next-themes";
+import AdaptiveThemeProvider from "@/components/providers/AdaptiveThemeProvider";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -97,17 +97,15 @@ export default async function LocaleLayout({
         className={`bg-linear-to-bl from-background to-foreground/5 relative w-full h-full overflow-x-clip ${geistSans.variable} ${geistMono.variable} antialiased scrollbar-hidden`}
         suppressHydrationWarning
       >
-        <ThemeProvider
-          attribute="class"
-          disableTransitionOnChange
+        <AdaptiveThemeProvider
           defaultTheme={siteConfig.themeConfig.colorMode.defaultMode}
-          {...siteConfig.themeConfig.colorMode.custom}
+          custom={siteConfig.themeConfig.colorMode.custom}
         >
           <SmoothScrollProvider>
             <Toaster />
             {children}
           </SmoothScrollProvider>
-        </ThemeProvider>
+        </AdaptiveThemeProvider>
       </body>
     </html>
   );
