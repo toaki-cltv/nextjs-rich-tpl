@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   let response = NextResponse.next();
   // カスタムヘッダーを追加する処理
   response.headers.set("x-url", request.url);
