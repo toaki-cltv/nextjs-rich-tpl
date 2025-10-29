@@ -7,14 +7,14 @@
 </p>
 
 <div align="center">
-  <a aria-label="Vercel logo" href="https://vercel.com">
+  <a aria-label="toakiryu link" href="https://toaki.cc">
     <img src="https://img.shields.io/badge/MADE%20BY%20TOAKI-000000.svg?style=for-the-badge&logo=github&labelColor=000">
   </a>
-  <a aria-label="NPM version" href="https://www.npmjs.com/package/create-next-rich-tpl/">
-    <img alt="NPM version" src="https://img.shields.io/npm/v/create-next-rich-tpl?style=for-the-badge&label=NPM&labelColor=black">
+  <a aria-label="template version" href="https://github.com/toaki-cltv/nextjs-rich-tpl/tree/main/templates/app/without-i18n-routing">
+    <img alt="template version" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftoaki-cltv%2Fnextjs-rich-tpl%2Frefs%2Fheads%2Fmain%2Ftemplates%2Fapp%2Fwithout-i18n-routing%2Fpackage.json&query=version&style=for-the-badge&label=version&labelColor=000">
   </a>
-  <a aria-label="License" href="https://github.com/toaki-cltv/nextjs-rich-tpl/blob/main/LICENSE.txt">
-    <img alt="License" src="https://img.shields.io/github/license/toaki-cltv/nextjs-rich-tpl?style=for-the-badge&labelColor=000000">
+  <a aria-label="template version" href="https://github.com/toaki-cltv/nextjs-rich-tpl/tree/main/templates/app/without-i18n-routing">
+    <img alt="template version" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftoaki-cltv%2Fnextjs-rich-tpl%2Frefs%2Fheads%2Fmain%2Ftemplates%2Fapp%2Fwithout-i18n-routing%2Fpackage.json&query=license&style=for-the-badge&label=license&labelColor=000">
   </a>
 </div>
 
