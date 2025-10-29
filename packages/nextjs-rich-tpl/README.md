@@ -1,11 +1,21 @@
 # Next.js Rich Template / CLI
 
+> [!WARNING]
+> **DEPRECATED**: This package is deprecated.
+>
+> For new projects and future use, please use the successor package `create-next-rich-tpl`.
+>
+> Recommended command:
+>
+> ```bash
+> npx create-next-rich-tpl
+> ```
+
 The Next.js Rich Template is a CLI tool that helps quickly set up Next.js applications. Using pre-prepared templates, you can easily create new projects.
 
 ## Table of Contents
 
 - [Features](#features)
-- [Installation](#installation)
 - [Usage](#usage)
 - [Dependencies](#dependencies)
 - [License](#license)

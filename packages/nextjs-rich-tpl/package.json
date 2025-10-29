@@ -2,7 +2,7 @@
   "name": "nextjs-rich-tpl",
   "version": "0.0.5",
   "type": "module",
-  "description": "A command-line tool to scaffold Next.js projects with rich templates and features.",
+  "description": "DEPRECATED: This package is deprecated. Please use `create-next-rich-tpl` (e.g. `npx create-next-rich-tpl`) as the successor. A command-line tool to scaffold Next.js projects with rich templates and features.",
   "scripts": {
     "dist-tag:ls": "pnpm dist-tag ls nextjs-rich-tpl",
     "release:latest": "pnpm publish --access public --tag latest --no-git-checks",
@@ -30,6 +30,7 @@
     "email": "toakiryu@gmail.com"
   },
   "homepage": "https://nextjs-rich-tpl.cltv.toaki.cc",
+  "deprecated": "This package is deprecated — use create-next-rich-tpl (https://www.npmjs.com/package/create-next-rich-tpl) or run `npx create-next-rich-tpl` to create new projects.",
   "license": "MIT",
   "keywords": [
     "nextjs",
