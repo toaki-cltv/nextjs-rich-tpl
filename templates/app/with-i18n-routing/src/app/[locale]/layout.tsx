@@ -16,7 +16,7 @@ import { routing } from "@/i18n/routing";
 
 import { Toaster } from "sonner";
 
-import { ThemeProvider } from "next-themes";
+import AdaptiveThemeProvider from "@/components/providers/AdaptiveThemeProvider";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 
 const geistSans = Geist({
@@ -156,11 +156,9 @@ export default async function LocaleLayout(props: LayoutProps) {
         className={`bg-linear-to-bl from-background to-foreground/5 relative w-full h-full overflow-x-clip ${geistSans.variable} ${geistMono.variable} antialiased scrollbar-hidden`}
         suppressHydrationWarning
       >
-        <ThemeProvider
-          attribute="class"
-          disableTransitionOnChange
+        <AdaptiveThemeProvider
           defaultTheme={siteConfig.themeConfig.colorMode.defaultMode}
-          {...siteConfig.themeConfig.colorMode.custom}
+          custom={siteConfig.themeConfig.colorMode.custom}
         >
           <NextIntlClientProvider messages={messages}>
             <SmoothScrollProvider>
@@ -168,7 +166,7 @@ export default async function LocaleLayout(props: LayoutProps) {
               {props.children}
             </SmoothScrollProvider>
           </NextIntlClientProvider>
-        </ThemeProvider>
+        </AdaptiveThemeProvider>
       </body>
     </html>
   );

@@ -177,6 +177,18 @@
   z-index: 999;
 }
 
+/*
+  When running the View Transitions API for theme changes we temporarily
+  disable ordinary CSS transitions/animations to prevent them from
+  overlapping the view transition (which can cause flicker or unexpected
+  cross-fades). The toggle adds/removes the class `disable-theme-transition`.
+*/
+.disable-theme-transition,
+.disable-theme-transition * {
+  transition: none !important;
+  animation: none !important;
+}
+
 /* GitHub Octocat wave animation */
 @keyframes octocat-wave {
   0%,
