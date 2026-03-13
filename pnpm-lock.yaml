@@ -39,8 +39,8 @@ importers:
         specifier: ^13.1.0
         version: 13.1.0(@types/node@25.0.3)
       ora:
-        specifier: ^9.0.0
-        version: 9.0.0
+        specifier: ^9.1.0
+        version: 9.1.0
 
   packages/nextjs-rich-tpl:
     dependencies:
@@ -1682,8 +1682,8 @@ packages:
     resolution: {integrity: sha512-tRkV3HJ1ASwm19THiiLIXLO7Im7wlTuKnvkYaTkyoAPefqjNg7W7DHKUlGRxy9vxDvbyCYQkQozvptuMkGCg8A==}
     engines: {node: '>=4'}
 
-  cli-spinners@3.3.0:
-    resolution: {integrity: sha512-/+40ljC3ONVnYIttjMWrlL51nItDAbBrq2upN8BPyvGU/2n5Oxw3tbNwORCaNuNqLJnxGqOfjUuhsv7l5Q4IsQ==}
+  cli-spinners@3.4.0:
+    resolution: {integrity: sha512-bXfOC4QcT1tKXGorxL3wbJm6XJPDqEnij2gQ2m7ESQuE+/z9YFIWnl/5RpTiKWbMq3EVKR4fRLJGn6DVfu0mpw==}
     engines: {node: '>=18.20'}
 
   cli-width@4.1.0:
@@ -2582,8 +2582,8 @@ packages:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
 
-  ora@9.0.0:
-    resolution: {integrity: sha512-m0pg2zscbYgWbqRR6ABga5c3sZdEon7bSgjnlXC64kxtxLOyjRcbbUkLj7HFyy/FTD+P2xdBWu8snGhYI0jc4A==}
+  ora@9.1.0:
+    resolution: {integrity: sha512-53uuLsXHOAJl5zLrUrzY9/kE+uIFEx7iaH4g2BIJQK4LZjY4LpCCYZVKDWIkL+F01wAaCg93duQ1whnK/AmY1A==}
     engines: {node: '>=20'}
 
   own-keys@1.0.1:
@@ -4360,7 +4360,7 @@ snapshots:
     dependencies:
       string-width: 4.2.3
 
-  cli-spinners@3.3.0: {}
+  cli-spinners@3.4.0: {}
 
   cli-width@4.1.0: {}
 
@@ -5402,17 +5402,16 @@ snapshots:
       type-check: 0.4.0
       word-wrap: 1.2.5
 
-  ora@9.0.0:
+  ora@9.1.0:
     dependencies:
       chalk: 5.6.2
       cli-cursor: 5.0.0
-      cli-spinners: 3.3.0
+      cli-spinners: 3.4.0
       is-interactive: 2.0.0
       is-unicode-supported: 2.1.0
       log-symbols: 7.0.1
       stdin-discarder: 0.2.2
       string-width: 8.1.0
-      strip-ansi: 7.1.2
 
   own-keys@1.0.1:
     dependencies:

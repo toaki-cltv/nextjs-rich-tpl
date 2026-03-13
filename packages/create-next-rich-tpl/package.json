@@ -33,7 +33,7 @@
     "commander": "^14.0.2",
     "degit": "^2.8.4",
     "inquirer": "^13.1.0",
-    "ora": "^9.0.0"
+    "ora": "^9.1.0"
   },
   "config": {
     "templatesIndexUrl": "https://raw.githubusercontent.com/toaki-cltv/nextjs-rich-tpl/main/templates/index.json"
